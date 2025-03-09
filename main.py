@@ -54,7 +54,7 @@ manaul_arm()
 print("MAIN:  Manual Arm Success")
 
 vehicle.simple_goto(LocationGlobalRelative(28.0597368, -82.4154961, 0), groundspeed=5)
-time.sleep(15)
+time.sleep(25)
 vehicle.simple_goto(LocationGlobalRelative(28.0596067, -82.4155176, 0), groundspeed=5)
 time.sleep(15)
 exit()
