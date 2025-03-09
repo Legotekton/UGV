@@ -26,30 +26,35 @@ def connectRover():
 vehicle = connectRover()
 print("Vehicle connected")
 
-def arm():
-    print("Basic pre-arm checks")
-    # Don't try to arm until autopilot is ready
-    while not vehicle.is_armable:
-        print(" Waiting for vehicle to initialise...")
-        time.sleep(1)
+def manaul_arm():
+  print ("    Pre-arm checks")
+  # Don't let the user try to arm until autopilot is ready
+  while not vehicle.is_armable:
+    print ("    Waiting for vehicle to initialise...")
+    time.sleep(1)
 
-    print("Arming motors")
-    # Copter should arm in GUIDED mode
-    vehicle.mode = VehicleMode("GUIDED")
-    vehicle.armed = True
+  while not vehicle.armed:
+    print ("    Waiting for arming...")
+    time.sleep(1)
 
-    # Confirm vehicle armed before attempting to take off
-    while not vehicle.armed:
-        print(" Waiting for arming...")
-        time.sleep(1)
+  print("   Waiting for manual arming...")
+  while not vehicle.armed:
+    print("   Waiting for arming...")
+    time.sleep(1)
 
-    print("Vehicle armed")
-    return
+  vehicle.mode = VehicleMode("GUIDED")
+
+  print("   Vehicle armed.")
+  print("   Mode: %s" % vehicle.mode.name) 
+
+print("MAIN:  Code Started")
 
 
-time.sleep(5)
-arm()
+manaul_arm()
+print("MAIN:  Manual Arm Success")
+
 vehicle.simple_goto(LocationGlobalRelative(28.0597368, -82.4154961, 0), ground_speed=1)
 time.sleep(15)
 vehicle.simple_goto(LocationGlobalRelative(28.0596067, -82.4155176, 0), ground_speed=1)
+time.sleep(15)
 exit()
