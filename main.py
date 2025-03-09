@@ -3,46 +3,51 @@ import time
 import argparse
 import os
 
-def connectMyCopter():
-        parser = argparse.ArgumentParser(description='commands')
-        parser.add_argument('--connect')
-        args = parser.parse_args()
+# Connect to the Vehicle function
+def connectRover():
+  print("Start Connection")
+  parser = argparse.ArgumentParser(description='commands')
+  parser.add_argument('--connect')
+  args = parser.parse_args()
 
-        connection_string = args.connect
-        baud_rate = 57600
+  connection_string = "/dev/ttyAMA0"
+  baud_rate = 57600
 
-        vehicle = connect(connection_string,baud=baud_rate) #,wait_ready=True)
-        return vehicle
+  print("Connecting...")
+  vehicle = connect(connection_string,baud=baud_rate) 
+  print("GPS: %s" % vehicle.gps_0)
+  print("Battery: %s" % vehicle.battery)
+  print("Armable?: %s" % vehicle.is_armable)
+  print("Mode: %s" % vehicle.mode.name)
+  #print("GPS Location: " % vehicle.location.global_frame)    
+
+  return vehicle
+
+vehicle = connectRover()
+print("Vehicle connected")
 
 def arm():
-        while vehicle.is_armable==False:
-                print("Waiting for vehicle to become armable..")
-                time.sleep(1)
+    print("Basic pre-arm checks")
+    # Don't try to arm until autopilot is ready
+    while not vehicle.is_armable:
+        print(" Waiting for vehicle to initialise...")
+        time.sleep(1)
 
-        print("Vehicle is now armable")
-        print("")
+    print("Arming motors")
+    # Copter should arm in GUIDED mode
+    vehicle.mode = VehicleMode("GUIDED")
+    vehicle.armed = True
 
-        vehicle.armed=True
-        while vehicle.armed==False:
-                print("Waiting for drone to become armed..")
-                time.sleep(1)
+    # Confirm vehicle armed before attempting to take off
+    while not vehicle.armed:
+        print(" Waiting for arming...")
+        time.sleep(1)
 
-        print("Vehicle is now armed")
-        print("Props are spinning!!")
+    print("Vehicle armed")
+    return
 
-        return None
-
-while (os.getppid() != 1):
-
-        vehicle = connectMyCopter()
-        arm()
-        time.sleep(5)
-        vehicle.armed=False
-        while vehicle.armed!=False:
-                print("Waiting for drone to disarm")
-                time.sleep(1)
-        vehicle.close()
-        print("End of Test")
-vehicle.armed=False
-vehicle.close()
-print("ssh lost")
+arm()
+vehicle.simple_goto(LocationGlobalRelative(28.0597368, -82.4154961, 0), ground_speed=1)
+time.sleep(15)
+vehicle.simple_goto(LocationGlobalRelative(28.0596067, -82.4155176, 0), ground_speed=1)
+exit()
