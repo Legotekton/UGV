@@ -46,6 +46,8 @@ def arm():
     print("Vehicle armed")
     return
 
+
+time.sleep(5)
 arm()
 vehicle.simple_goto(LocationGlobalRelative(28.0597368, -82.4154961, 0), ground_speed=1)
 time.sleep(15)
