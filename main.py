@@ -57,7 +57,7 @@ def manaul_arm():
 print("MAIN:  Code Started")
 
 
-#manaul_arm()
+manaul_arm()
 print("MAIN:  Manual Arm Success")
 print("Waiting for GPS coordinates from UAV...")
 recived_data = False
@@ -69,7 +69,7 @@ while recived_data == False:
     recived_data = True
     
 print(f"Received GPS coordinates: Latitude: {lat}, Longitude: {lon}, Altitude: {alt}")
-#vehicle.simple_goto(LocationGlobalRelative(lat, lon, 0), groundspeed=5)
-#time.sleep(25)
+vehicle.simple_goto(LocationGlobalRelative(lat, lon, 0), groundspeed=5)
+time.sleep(25)
 print("Arrived at the destination.")
 exit()
