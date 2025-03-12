@@ -2,6 +2,7 @@ from dronekit import connect, VehicleMode, LocationGlobalRelative, APIException
 import time
 import argparse
 import os
+import socket
 
 UGV_IP = "10.42.0.120"  # Update with actual UGV IP
 PORT = 5005
