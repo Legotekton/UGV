@@ -3,6 +3,12 @@ import time
 import argparse
 import os
 
+UGV_IP = "10.42.0.120"  # Update with actual UGV IP
+PORT = 5005
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind((UGV_IP, PORT))
+
 # Connect to the Vehicle function
 def connectRover():
   print("Start Connection")
@@ -50,11 +56,19 @@ def manaul_arm():
 print("MAIN:  Code Started")
 
 
-manaul_arm()
+#manaul_arm()
 print("MAIN:  Manual Arm Success")
-
-vehicle.simple_goto(LocationGlobalRelative(28.0597368, -82.4154961, 0), groundspeed=5)
-time.sleep(25)
-vehicle.simple_goto(LocationGlobalRelative(28.0596067, -82.4155176, 0), groundspeed=5)
-time.sleep(15)
+print("Waiting for GPS coordinates from UAV...")
+recived_data = False
+lat = 0
+while recived_data == False:
+  data, addr = sock.recvfrom(1024)
+  lat, lon, alt = map(float, data.decode().split(","))
+  if lat != 0:
+    recived_data = True
+    
+print(f"Received GPS coordinates: Latitude: {lat}, Longitude: {lon}, Altitude: {alt}")
+#vehicle.simple_goto(LocationGlobalRelative(lat, lon, 0), groundspeed=5)
+#time.sleep(25)
+print("Arrived at the destination.")
 exit()
