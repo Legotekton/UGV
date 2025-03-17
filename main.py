@@ -3,12 +3,8 @@ import time
 import argparse
 import os
 import socket
+import math
 
-UGV_IP = "10.42.0.120"  # Update with actual UGV IP
-PORT = 5005
-
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind((UGV_IP, PORT))
 
 # Connect to the Vehicle function
 def connectRover():
@@ -30,9 +26,7 @@ def connectRover():
 
   return vehicle
 
-vehicle = connectRover()
-print("Vehicle connected")
-
+# Function to manually arm the vehicle
 def manaul_arm():
   print ("    Pre-arm checks")
   # Don't let the user try to arm until autopilot is ready
@@ -54,22 +48,66 @@ def manaul_arm():
   print("   Vehicle armed.")
   print("   Mode: %s" % vehicle.mode.name) 
 
+# Function to calculate distance between two GPS coordinates
+def distance_to(target_location, current_location):
+    dlat = target_location.lat - current_location.lat
+    dlong = target_location.lon - current_location.lon
+    return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
+
+
+# Function to move to a waypoint and check when it is reached
+def goto_waypoint(waypoint, waypoint_number):
+    print(f"Going towards waypoint {waypoint_number}...")
+    vehicle.simple_goto(waypoint)
+
+    while True:
+        current_location = vehicle.location.global_relative_frame
+        distance = distance_to(waypoint, current_location)
+
+        if distance < 0.5:  # Stop when within 1 meter of the target
+            print(f"Reached waypoint {waypoint_number}")
+            break
+
+        print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
+        time.sleep(1)  # Check every second
+
+
+
+# Main execution
 print("MAIN:  Code Started")
 
+#UGV_IP = "10.42.0.120"  # Update with actual UGV IP
+#PORT = 5005
+#sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#sock.bind((UGV_IP, PORT))
+#print("Socket bound to IP:", UGV_IP)
+
+
+vehicle = connectRover()
+print("Vehicle connected")
 
 manaul_arm()
-print("MAIN:  Manual Arm Success")
-print("Waiting for GPS coordinates from UAV...")
-recived_data = False
-lat = 0
-while recived_data == False:
-  data, addr = sock.recvfrom(1024)
-  lat, lon, alt = map(float, data.decode().split(","))
-  if lat != 0:
-    recived_data = True
-    
-print(f"Received GPS coordinates: Latitude: {lat}, Longitude: {lon}, Altitude: {alt}")
-vehicle.simple_goto(LocationGlobalRelative(lat, lon, 0), groundspeed=5)
-time.sleep(25)
-print("Arrived at the destination.")
+
+#print("Waiting for GPS coordinates from UAV...")
+#recived_data = False
+#lat = 0
+#while recived_data == False:
+#  data, addr = sock.recvfrom(1024)
+#  lat, lon, alt = map(float, data.decode().split(","))
+#  if lat != 0:
+#    recived_data = True
+#    
+#print(f"Received GPS coordinates: Latitude: {lat}, Longitude: {lon}, Altitude: {alt}")
+
+waypoints = [
+  LocationGlobalRelative(28.0615262, -82.4168345, 0),
+  LocationGlobalRelative(28.0615097, -82.4163678, 0),
+  LocationGlobalRelative(28.0612895, -82.4167702, 0),
+  LocationGlobalRelative(28.0612895, -82.4164456, 0),
+]
+
+for i, waypoint in enumerate(waypoints):
+    goto_waypoint(waypoint, i + 1)
+    print(f"Arrived at {waypoint(i+1)}")
+
 exit()
