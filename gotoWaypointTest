@@ -5,7 +5,6 @@ import os
 import socket
 import math
 
-
 # Connect to the Vehicle function
 def connectRover():
   print("Start Connection")
@@ -71,42 +70,24 @@ def goto_waypoint(waypoint, waypoint_number):
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(1)  # Check every second
 
-# Function to receive GPS coordinates from the UAV
-def receive_gps(lat, lon, alt):
-    print("Waiting for GPS coordinates from UAV...")
-    while True:
-        data, addr = sock.recvfrom(1024)
-        lat, lon, alt = map(float, data.decode().split(","))
-        if lat != 0:
-            break
-    return lat, lon, alt
-
 
 
 # Main execution
 print("MAIN:  Code Started")
-
-UGV_IP = "10.42.0.120"  # Update with actual UGV IP
-PORT = 5005
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind((UGV_IP, PORT))
-print("Socket bound to IP:", UGV_IP)
-
 
 vehicle = connectRover()
 print("Vehicle connected")
 
 manaul_arm()
 
-# Initialize GPS coordinates
-lat = 0
-lon = 0
-alt = 0
+waypoints = [
+  LocationGlobalRelative(28.0615262, -82.4168345, 0),
+  LocationGlobalRelative(28.0615097, -82.4163678, 0),
+  LocationGlobalRelative(28.0612895, -82.4167702, 0),
+  LocationGlobalRelative(28.0612895, -82.4164456, 0),
+]
 
-# Receive GPS coordinates from the UAV
-receive_gps(lat, lon, alt)
-print(f"Received GPS coordinates: Latitude: {lat}, Longitude: {lon}, Altitude: {alt}")
-
-goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
+for i, waypoint in enumerate(waypoints):
+    goto_waypoint(waypoint, i + 1)
 
 exit()

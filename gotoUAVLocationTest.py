@@ -4,49 +4,50 @@ import argparse
 import os
 import socket
 import math
+import concurrent
 
 
 # Connect to the Vehicle function
 def connectRover():
-  print("Start Connection")
-  parser = argparse.ArgumentParser(description='commands')
-  parser.add_argument('--connect')
-  args = parser.parse_args()
+    print("Start Connection")
+    parser = argparse.ArgumentParser(description='commands')
+    parser.add_argument('--connect')
+    args = parser.parse_args()
 
-  connection_string = "/dev/ttyAMA0"
-  baud_rate = 57600
+    connection_string = "/dev/ttyAMA0"
+    baud_rate = 57600
 
-  print("Connecting...")
-  vehicle = connect(connection_string,baud=baud_rate) 
-  print("GPS: %s" % vehicle.gps_0)
-  print("Battery: %s" % vehicle.battery)
-  print("Armable?: %s" % vehicle.is_armable)
-  print("Mode: %s" % vehicle.mode.name)
-  #print("GPS Location: " % vehicle.location.global_frame)    
+    print("Connecting...")
+    vehicle = connect(connection_string,baud=baud_rate) 
+    print("GPS: %s" % vehicle.gps_0)
+    print("Battery: %s" % vehicle.battery)
+    print("Armable?: %s" % vehicle.is_armable)
+    print("Mode: %s" % vehicle.mode.name)
+    #print("GPS Location: " % vehicle.location.global_frame)    
 
-  return vehicle
+    return vehicle
 
 # Function to manually arm the vehicle
 def manaul_arm():
-  print ("    Pre-arm checks")
-  # Don't let the user try to arm until autopilot is ready
-  while not vehicle.is_armable:
-    print ("    Waiting for vehicle to initialise...")
-    time.sleep(1)
+    print ("    Pre-arm checks")
+    # Don't let the user try to arm until autopilot is ready
+    while not vehicle.is_armable:
+        print ("    Waiting for vehicle to initialise...")
+        time.sleep(1)
 
-  while not vehicle.armed:
-    print ("    Waiting for arming...")
-    time.sleep(1)
+    while not vehicle.armed:
+        print ("    Waiting for arming...")
+        time.sleep(1)
 
-  print("   Waiting for manual arming...")
-  while not vehicle.armed:
-    print("   Waiting for arming...")
-    time.sleep(1)
+    print("   Waiting for manual arming...")
+    while not vehicle.armed:
+        print("   Waiting for arming...")
+        time.sleep(1)
 
-  vehicle.mode = VehicleMode("GUIDED")
+    vehicle.mode = VehicleMode("GUIDED")
 
-  print("   Vehicle armed.")
-  print("   Mode: %s" % vehicle.mode.name) 
+    print("   Vehicle armed.")
+    print("   Mode: %s" % vehicle.mode.name) 
 
 # Function to calculate distance between two GPS coordinates
 def distance_to(target_location, current_location):
@@ -92,7 +93,6 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UGV_IP, PORT))
 print("Socket bound to IP:", UGV_IP)
 
-
 vehicle = connectRover()
 print("Vehicle connected")
 
@@ -103,10 +103,12 @@ lat = 0
 lon = 0
 alt = 0
 
-# Receive GPS coordinates from the UAV
-receive_gps(lat, lon, alt)
+# Start a thread to receive GPS coordinates
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    future = executor.submit(receive_gps, 'lat', 'lon', 'alt')
+    lat, lon, alt = future.result()
 print(f"Received GPS coordinates: Latitude: {lat}, Longitude: {lon}, Altitude: {alt}")
 
-goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
+goto_waypoint()
 
 exit()
