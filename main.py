@@ -104,7 +104,7 @@ lon = 0
 alt = 0
 
 # Receive GPS coordinates from the UAV
-receive_gps(lat, lon, alt)
+lat, lon, alt = receive_gps(lat, lon, alt)
 print(f"Received GPS coordinates: Latitude: {lat}, Longitude: {lon}, Altitude: {alt}")
 
 goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
