@@ -35,7 +35,7 @@ def connectRover():
   print("Battery: %s" % vehicle.battery)
   print("Armable?: %s" % vehicle.is_armable)
   print("Mode: %s" % vehicle.mode.name)
-  #print("GPS Location: " % vehicle.location.global_frame)    
+  print("GPS Location: " % vehicle.location.global_frame)    
 
   return vehicle
 
@@ -96,12 +96,12 @@ def goto_waypoint(waypoint, waypoint_number):
 # Main execution
 print("MAIN:  Code Started")
 
-telem_link = setup_telem_connection()
-
 vehicle = connectRover()
 print("Vehicle connected")
 
 manaul_arm()
+
+telem_link = setup_telem_connection()
 
 while True:
     # Wait for the next GPS_RAW_INT message
@@ -127,6 +127,7 @@ while True:
         print(f"  Satellites Visible: {satellites}")
         break
 
+print(vehicle.location.global_frame)
 goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
 
 exit()
