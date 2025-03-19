@@ -82,7 +82,7 @@ def goto_waypoint(waypoint, waypoint_number):
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
 
-        if distance < 1.25:  # Stop when within 1 meter of the target
+        if distance < 0.5:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
