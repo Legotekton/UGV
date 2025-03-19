@@ -35,7 +35,7 @@ def connectRover():
   print("Battery: %s" % vehicle.battery)
   print("Armable?: %s" % vehicle.is_armable)
   print("Mode: %s" % vehicle.mode.name)
-  print("GPS Location: " % vehicle.location.global_frame)    
+  #print("GPS Location: " % vehicle.location.global_frame)    
 
   return vehicle
 
