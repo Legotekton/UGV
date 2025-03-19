@@ -99,9 +99,9 @@ print("MAIN:  Code Started")
 vehicle = connectRover()
 print("Vehicle connected")
 
-manaul_arm()
-
 telem_link = setup_telem_connection()
+
+manaul_arm()
 
 while True:
     # Wait for the next GPS_RAW_INT message
