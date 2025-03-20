@@ -129,7 +129,8 @@ while True:
         print(f"Velocity: {vx}, {vy}, {vz}")
         print(f"Covariance: {covariance}")
         
-        goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
+        target_location = LocationGlobalRelative(lat,lon,alt)
+        goto_waypoint(target_location, 1)
 
 
 exit()
