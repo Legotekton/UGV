@@ -4,6 +4,22 @@ import argparse
 import os
 import socket
 import math
+from pymavlink import mavutil
+
+
+
+# Function to setup the telemetry connection
+def setup_telem_connection():
+    telem_port = "/dev/ttyUSB0"  # Same telemetry module
+    baud_rate = 57600  # Same baud rate
+
+    print("Connecting to telemetry module for Pi-to-Pi communication...")
+    telem_link = mavutil.mavlink_connection(telem_port, baud=baud_rate)
+    print("Telemetry link established, waiting for data...")
+
+    return telem_link
+
+
 
 # Connect to the Vehicle function
 def connectRover():
@@ -24,6 +40,8 @@ def connectRover():
   #print("GPS Location: " % vehicle.location.global_frame)    
 
   return vehicle
+
+
 
 # Function to manually arm the vehicle
 def manaul_arm():
@@ -47,11 +65,14 @@ def manaul_arm():
   print("   Vehicle armed.")
   print("   Mode: %s" % vehicle.mode.name) 
 
+
+
 # Function to calculate distance between two GPS coordinates
 def distance_to(target_location, current_location):
     dlat = target_location.lat - current_location.lat
     dlong = target_location.lon - current_location.lon
     return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
+
 
 
 # Function to move to a waypoint and check when it is reached
@@ -63,12 +84,14 @@ def goto_waypoint(waypoint, waypoint_number):
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
 
-        if distance < 1.25:  # Stop when within 1 meter of the target
+        if distance < 0.5:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(1)  # Check every second
+
+
 
 
 
@@ -78,16 +101,42 @@ print("MAIN:  Code Started")
 vehicle = connectRover()
 print("Vehicle connected")
 
+telem_link = setup_telem_connection()
+
 manaul_arm()
 
-waypoints = [
-  LocationGlobalRelative(28.0615262, -82.4168345, 0),
-  LocationGlobalRelative(28.0615097, -82.4163678, 0),
-  LocationGlobalRelative(28.0612895, -82.4167702, 0),
-  LocationGlobalRelative(28.0612895, -82.4164456, 0),
-]
+print("Waiting for GPS data...")
 
-for i, waypoint in enumerate(waypoints):
-    goto_waypoint(waypoint, i + 1)
+while True:
+    # Wait for the next GLOBAL_POSITION_INT_COV message
+    msg = telem_link.recv_match(type="GLOBAL_POSITION_INT_COV", blocking=True)
+
+    if not msg:
+        continue
+    if msg.get_type() == "BAD_DATA":
+        if mavutil.all_printable(msg.data):
+            sys.stdout.write(msg.data)
+            sys.stdout.flush()
+    else:
+        #Message is valid
+        time_usec = msg.time_usec  # Timestamp in microseconds
+        estimator_type = msg.estimator_type  # Class id of the estimator this estimate originated from
+        lat = msg.lat / 1e7  # Convert back to decimal degrees
+        lon = msg.lon / 1e7
+        alt = msg.alt / 1000  # Convert back to meters
+        relative_alt = msg.relative_alt / 1000 
+        vx = msg.vx / 100
+        vy = msg.vy / 100
+        vz = msg.vz / 100
+        covariance = msg.covariance
+
+        print(f"GPS data received: {lat}, {lon}, {alt}")
+        print(f"Altitude: {alt}")
+        print(f"Relative altitude: {relative_alt}")
+        print(f"Velocity: {vx}, {vy}, {vz}")
+        print(f"Covariance: {covariance}")
+        
+        goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
+
 
 exit()

@@ -6,6 +6,8 @@ import socket
 import math
 from pymavlink import mavutil
 
+
+
 # Function to setup the telemetry connection
 def setup_telem_connection():
     telem_port = "/dev/ttyUSB0"  # Same telemetry module
@@ -105,30 +107,28 @@ manaul_arm()
 
 print("Waiting for GPS data...")
 while True:
-    # Wait for the next GPS_RAW_INT message
-    msg = telem_link.recv_match(type="GPS_RAW_INT", blocking=True)
+    # Wait for the next GLOBAL_POSITION_INT_COV message
+    msg = telem_link.recv_match(type="GLOBAL_POSITION_INT_COV", blocking=True)
 
     if msg:
+        time_usec = msg.time_usec  # Timestamp in microseconds
+        estimator_type = msg.estimator_type  # Class id of the estimator this estimate originated from
         lat = msg.lat / 1e7  # Convert back to decimal degrees
         lon = msg.lon / 1e7
         alt = msg.alt / 1000  # Convert back to meters
-        hdop = msg.eph  # Horizontal accuracy in cm
-        vdop = msg.epv  # Vertical accuracy in cm
-        vel = msg.vel / 100  # Convert to m/s
-        cog = msg.cog / 100  # Convert to degrees
-        satellites = msg.satellites_visible  # Number of satellites
+        relative_alt = msg.relative_alt / 1000 
+        vx = msg.vx / 100
+        vy = msg.vy / 100
+        vz = msg.vz / 100
+        covariance = msg.covariance
 
-        print(f"Received GPS Data:")
-        print(f"  Latitude: {lat}")
-        print(f"  Longitude: {lon}")
-        print(f"  Altitude: {alt} m")
-        print(f"  Accuracy: HDOP {hdop} cm, VDOP {vdop} cm")
-        print(f"  Velocity: {vel} m/s")
-        print(f"  Heading: {cog}°")
-        print(f"  Satellites Visible: {satellites}")
-        break
+        print(f"GPS data received: {lat}, {lon}, {alt}")
+        print(f"Altitude: {alt}")
+        print(f"Relative altitude: {relative_alt}")
+        print(f"Velocity: {vx}, {vy}, {vz}")
+        print(f"Covariance: {covariance}")
+        
+        goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
 
-print(vehicle.location.global_frame)
-goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
 
 exit()

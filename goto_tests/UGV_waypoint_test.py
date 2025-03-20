@@ -4,20 +4,6 @@ import argparse
 import os
 import socket
 import math
-from pymavlink import mavutil
-
-# Function to setup the telemetry connection
-def setup_telem_connection():
-    telem_port = "/dev/ttyUSB0"  # Same telemetry module
-    baud_rate = 57600  # Same baud rate
-
-    print("Connecting to telemetry module for Pi-to-Pi communication...")
-    telem_link = mavutil.mavlink_connection(telem_port, baud=baud_rate)
-    print("Telemetry link established, waiting for data...")
-
-    return telem_link
-
-
 
 # Connect to the Vehicle function
 def connectRover():
@@ -38,8 +24,6 @@ def connectRover():
   #print("GPS Location: " % vehicle.location.global_frame)    
 
   return vehicle
-
-
 
 # Function to manually arm the vehicle
 def manaul_arm():
@@ -63,14 +47,11 @@ def manaul_arm():
   print("   Vehicle armed.")
   print("   Mode: %s" % vehicle.mode.name) 
 
-
-
 # Function to calculate distance between two GPS coordinates
 def distance_to(target_location, current_location):
     dlat = target_location.lat - current_location.lat
     dlong = target_location.lon - current_location.lon
     return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
-
 
 
 # Function to move to a waypoint and check when it is reached
@@ -82,14 +63,12 @@ def goto_waypoint(waypoint, waypoint_number):
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
 
-        if distance < 0.5:  # Stop when within 1 meter of the target
+        if distance < 1.25:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(1)  # Check every second
-
-
 
 
 
@@ -99,36 +78,13 @@ print("MAIN:  Code Started")
 vehicle = connectRover()
 print("Vehicle connected")
 
-telem_link = setup_telem_connection()
-
 manaul_arm()
 
-print("Waiting for GPS data...")
-while True:
-    # Wait for the next GPS_RAW_INT message
-    msg = telem_link.recv_match(type="GPS_RAW_INT", blocking=True)
+waypoints = [
+  LocationGlobalRelative(27.9866837, -82.3015059, 26.2)
+]
 
-    if msg:
-        lat = msg.lat / 1e7  # Convert back to decimal degrees
-        lon = msg.lon / 1e7
-        alt = msg.alt / 1000  # Convert back to meters
-        hdop = msg.eph  # Horizontal accuracy in cm
-        vdop = msg.epv  # Vertical accuracy in cm
-        vel = msg.vel / 100  # Convert to m/s
-        cog = msg.cog / 100  # Convert to degrees
-        satellites = msg.satellites_visible  # Number of satellites
-
-        print(f"Received GPS Data:")
-        print(f"  Latitude: {lat}")
-        print(f"  Longitude: {lon}")
-        print(f"  Altitude: {alt} m")
-        print(f"  Accuracy: HDOP {hdop} cm, VDOP {vdop} cm")
-        print(f"  Velocity: {vel} m/s")
-        print(f"  Heading: {cog}°")
-        print(f"  Satellites Visible: {satellites}")
-        break
-
-print(vehicle.location.global_frame)
-goto_waypoint(LocationGlobalRelative(lat, lon, alt), 1)
+for i, waypoint in enumerate(waypoints):
+    goto_waypoint(waypoint, i + 1)
 
 exit()
