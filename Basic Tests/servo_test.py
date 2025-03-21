@@ -102,23 +102,6 @@ print("MAIN:  Code Started")
 vehicle = connectRover()
 print("Vehicle connected")
 
-# Establish connection to Pixhawk
-#master = mavutil.mavlink_connection("/dev/ttyAMA0", baud=57600)
-#master.wait_heartbeat()
-
-
-# Function to send servo command
-# def set_servo_pwm(channel, pwm_value):
-#  master.mav.command_long_send(
-#        master.target_system, 
-#        master.target_component,
-#        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
-#        0,  # Confirmation
-#        channel,  # Channel number
-#        pwm_value,  # PWM value
-#        0, 0, 0, 0, 0  # Unused parameters
-#    )
-
 def set_servo_pwm(channel, pwm_value):
     """
     Sends a MAV_CMD_DO_SET_SERVO command to set servo PWM.
@@ -138,8 +121,8 @@ def set_servo_pwm(channel, pwm_value):
     print(f"Servo {channel} set to {pwm_value} µs")
 
 
-# Example: Move servo on AUX1 (Channel 9) to 1500µs
-set_servo_pwm(4, 1500)
+# Example: Move servo on Channel 4 to 1500µs
+set_servo_pwm(4, 1900)
 time.sleep(2)
 
 exit()
