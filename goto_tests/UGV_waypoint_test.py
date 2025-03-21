@@ -57,7 +57,7 @@ def distance_to(target_location, current_location):
 # Function to move to a waypoint and check when it is reached
 def goto_waypoint(waypoint, waypoint_number):
     print(f"Going towards waypoint {waypoint_number}...")
-    vehicle.simple_goto(waypoint, groundspeed=1)
+    vehicle.simple_goto(waypoint, groundspeed=2.5)
 
     while True:
         current_location = vehicle.location.global_relative_frame
