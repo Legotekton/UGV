@@ -67,33 +67,6 @@ def manaul_arm():
 
 
 
-# Function to calculate distance between two GPS coordinates
-def distance_to(target_location, current_location):
-    dlat = target_location.lat - current_location.lat
-    dlong = target_location.lon - current_location.lon
-    return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
-
-
-
-# Function to move to a waypoint and check when it is reached
-def goto_waypoint(waypoint, waypoint_number):
-    print(f"Going towards waypoint {waypoint_number}...")
-    
-
-    while True:
-        current_location = vehicle.location.global_relative_frame
-        distance = distance_to(waypoint, current_location)
-
-        if distance > 0.5:  # Stop when within 1 meter of the target
-            vehicle.simple_goto(waypoint, groundspeed=2)
-            print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
-            time.sleep(1) 
-        else:
-            print(f"Reached waypoint {waypoint_number}")
-            break
-
-
-
 
 
 # Main execution
@@ -102,26 +75,29 @@ print("MAIN:  Code Started")
 vehicle = connectRover()
 print("Vehicle connected")
 
-# Establish connection to Pixhawk
-master = mavutil.mavlink_connection("/dev/serial0", baud=57600)
-master.wait_heartbeat()
+telem_link = setup_telem_connection()
 
+print("Waiting for GPS data...")
+while True:
+    # Wait for the next GLOBAL_POSITION_INT_COV message
+    msg = telem_link.recv_match(type="GLOBAL_POSITION_INT_COV", blocking=True)
 
-# Function to send servo command
-def set_servo_pwm(channel, pwm_value):
-    master.mav.command_long_send(
-        master.target_system, 
-        master.target_component,
-        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
-        0,  # Confirmation
-        channel,  # Channel number
-        pwm_value,  # PWM value
-        0, 0, 0, 0, 0  # Unused parameters
-    )
+    if msg:
+        time_usec = msg.time_usec  # Timestamp in microseconds
+        estimator_type = msg.estimator_type  # Class id of the estimator this estimate originated from
+        lat = msg.lat / 1e7  # Convert back to decimal degrees
+        lon = msg.lon / 1e7
+        alt = msg.alt / 1000  # Convert back to meters
+        relative_alt = msg.relative_alt / 1000 
+        vx = msg.vx / 100
+        vy = msg.vy / 100
+        vz = msg.vz / 100
+        covariance = msg.covariance
 
-# Example: Move servo on AUX1 (Channel 9) to 1500µs
-set_servo_pwm(4, 1500)
-time.sleep(2)
-
+        print(f"GPS data received: {lat}, {lon}, {alt}")
+        print(f"Altitude: {alt}")
+        print(f"Relative altitude: {relative_alt}")
+        print(f"Velocity: {vx}, {vy}, {vz}")
+        print(f"Covariance: {covariance}")
 
 exit()

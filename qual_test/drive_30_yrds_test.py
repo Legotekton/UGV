@@ -4,22 +4,6 @@ import argparse
 import os
 import socket
 import math
-from pymavlink import mavutil
-
-
-
-# Function to setup the telemetry connection
-def setup_telem_connection():
-    telem_port = "/dev/ttyUSB0"  # Same telemetry module
-    baud_rate = 57600  # Same baud rate
-
-    print("Connecting to telemetry module for Pi-to-Pi communication...")
-    telem_link = mavutil.mavlink_connection(telem_port, baud=baud_rate)
-    print("Telemetry link established, waiting for data...")
-
-    return telem_link
-
-
 
 # Connect to the Vehicle function
 def connectRover():
@@ -40,8 +24,6 @@ def connectRover():
   #print("GPS Location: " % vehicle.location.global_frame)    
 
   return vehicle
-
-
 
 # Function to manually arm the vehicle
 def manaul_arm():
@@ -65,8 +47,6 @@ def manaul_arm():
   print("   Vehicle armed.")
   print("   Mode: %s" % vehicle.mode.name) 
 
-
-
 # Function to calculate distance between two GPS coordinates
 def distance_to(target_location, current_location):
     dlat = target_location.lat - current_location.lat
@@ -74,25 +54,17 @@ def distance_to(target_location, current_location):
     return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
 
 
-
 # Function to move to a waypoint and check when it is reached
 def goto_waypoint(waypoint, waypoint_number):
     print(f"Going towards waypoint {waypoint_number}...")
-    
+    vehicle.simple_goto(waypoint, groundspeed=1)
 
     while True:
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
-
-        if distance > 0.5:  # Stop when within 1 meter of the target
-            vehicle.simple_goto(waypoint, groundspeed=2)
-            print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
-            time.sleep(1) 
-        else:
-            print(f"Reached waypoint {waypoint_number}")
-            break
-
-
+        time.sleep(45)
+        print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
+        time.sleep(1)  # Check every second
 
 
 
@@ -102,26 +74,14 @@ print("MAIN:  Code Started")
 vehicle = connectRover()
 print("Vehicle connected")
 
-# Establish connection to Pixhawk
-master = mavutil.mavlink_connection("/dev/serial0", baud=57600)
-master.wait_heartbeat()
+manaul_arm()
 
+waypoints = [
+    # Put a waypoint 30 yrds in front of UGV start
+    LocationGlobalRelative(27.9866901, -82.3015334, 21.62)
+]
 
-# Function to send servo command
-def set_servo_pwm(channel, pwm_value):
-    master.mav.command_long_send(
-        master.target_system, 
-        master.target_component,
-        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
-        0,  # Confirmation
-        channel,  # Channel number
-        pwm_value,  # PWM value
-        0, 0, 0, 0, 0  # Unused parameters
-    )
-
-# Example: Move servo on AUX1 (Channel 9) to 1500µs
-set_servo_pwm(4, 1500)
-time.sleep(2)
-
+for i, waypoint in enumerate(waypoints):
+    goto_waypoint(waypoint, i + 1)
 
 exit()
