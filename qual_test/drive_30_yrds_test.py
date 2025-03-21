@@ -78,7 +78,7 @@ manaul_arm()
 
 waypoints = [
     # Put a waypoint 30 yrds in front of UGV start
-    LocationGlobalRelative(27.9866901, -82.3015334, 21.62)
+    
 ]
 
 for i, waypoint in enumerate(waypoints):
