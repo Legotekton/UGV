@@ -99,25 +99,44 @@ def goto_waypoint(waypoint, waypoint_number):
 # Main execution
 print("MAIN:  Code Started")
 
-#vehicle = connectRover()
+vehicle = connectRover()
 print("Vehicle connected")
 
 # Establish connection to Pixhawk
-master = mavutil.mavlink_connection("/dev/ttyAMA0", baud=57600)
-master.wait_heartbeat()
+#master = mavutil.mavlink_connection("/dev/ttyAMA0", baud=57600)
+#master.wait_heartbeat()
 
 
 # Function to send servo command
+# def set_servo_pwm(channel, pwm_value):
+#  master.mav.command_long_send(
+#        master.target_system, 
+#        master.target_component,
+#        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
+#        0,  # Confirmation
+#        channel,  # Channel number
+#        pwm_value,  # PWM value
+#        0, 0, 0, 0, 0  # Unused parameters
+#    )
+
 def set_servo_pwm(channel, pwm_value):
-    master.mav.command_long_send(
-        master.target_system, 
-        master.target_component,
-        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
+    """
+    Sends a MAV_CMD_DO_SET_SERVO command to set servo PWM.
+    :param channel: Servo channel (9-14 for AUX pins)
+    :param pwm_value: PWM value (1100-1900 µs)
+    """
+    msg = vehicle.message_factory.command_long_encode(
+        0, 0,  # target system, target component
+        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,  # Command
         0,  # Confirmation
-        channel,  # Channel number
+        channel,  # Servo channel
         pwm_value,  # PWM value
         0, 0, 0, 0, 0  # Unused parameters
     )
+    vehicle.send_mavlink(msg)
+    vehicle.flush()
+    print(f"Servo {channel} set to {pwm_value} µs")
+
 
 # Example: Move servo on AUX1 (Channel 9) to 1500µs
 set_servo_pwm(4, 1500)
