@@ -54,17 +54,49 @@ def distance_to(target_location, current_location):
     return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
 
 
+
 # Function to move to a waypoint and check when it is reached
 def goto_waypoint(waypoint, waypoint_number):
     print(f"Going towards waypoint {waypoint_number}...")
-    vehicle.simple_goto(waypoint, groundspeed=1)
+    vehicle.simple_goto(waypoint, groundspeed=2)
 
     while True:
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
-        time.sleep(45)
+
+        if distance < 0.5:  # Stop when within 1 meter of the target
+            print(f"Reached waypoint {waypoint_number}")
+            break
+
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(1)  # Check every second
+
+
+
+# Function to calculate new GPS coordinates based on distance and heading
+def get_target_location(original_location, distance_meters, heading_degrees):
+    """
+    Compute a new latitude/longitude given a starting point, distance, and heading.
+    """
+    earth_radius = 6378137.0  # Earth radius in meters
+
+    # Convert latitude/longitude from degrees to radians
+    lat1 = math.radians(original_location.lat)
+    lon1 = math.radians(original_location.lon)
+
+    # Convert heading to radians
+    heading = math.radians(heading_degrees)
+
+    # Calculate new latitude
+    lat2 = math.asin(math.sin(lat1) * math.cos(distance_meters / earth_radius) +
+                     math.cos(lat1) * math.sin(distance_meters / earth_radius) * math.cos(heading))
+
+    # Calculate new longitude
+    lon2 = lon1 + math.atan2(math.sin(heading) * math.sin(distance_meters / earth_radius) * math.cos(lat1),
+                             math.cos(distance_meters / earth_radius) - math.sin(lat1) * math.sin(lat2))
+
+    # Convert back to degrees
+    return LocationGlobalRelative(math.degrees(lat2), math.degrees(lon2), original_location.alt)
 
 
 
@@ -76,12 +108,15 @@ print("Vehicle connected")
 
 manaul_arm()
 
-waypoints = [
-    # Put a waypoint 30 yrds in front of UGV start
-    
-]
+start_location = vehicle.location.global_relative_frame
 
-for i, waypoint in enumerate(waypoints):
-    goto_waypoint(waypoint, i + 1)
+target_location = get_target_location(start_location, 27.4, vehicle.heading)  
+
+#waypoints = [
+    # Put a waypoint 30 yrds in front of UGV start
+#]
+
+#for i, waypoint in enumerate(waypoints):
+goto_waypoint(target_location, 1)
 
 exit()

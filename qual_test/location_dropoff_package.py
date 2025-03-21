@@ -4,6 +4,9 @@ import argparse
 import os
 import socket
 import math
+from pymavlink import mavutil
+
+
 
 # Connect to the Vehicle function
 def connectRover():
@@ -24,6 +27,8 @@ def connectRover():
   #print("GPS Location: " % vehicle.location.global_frame)    
 
   return vehicle
+
+
 
 # Function to manually arm the vehicle
 def manaul_arm():
@@ -46,6 +51,8 @@ def manaul_arm():
 
   print("   Vehicle armed.")
   print("   Mode: %s" % vehicle.mode.name) 
+
+
 
 # Function to calculate distance between two GPS coordinates
 def distance_to(target_location, current_location):
@@ -74,6 +81,7 @@ def goto_waypoint(waypoint, waypoint_number):
 
 
 
+
 # Main execution
 print("MAIN:  Code Started")
 
@@ -88,5 +96,30 @@ waypoints = [
 
 for i, waypoint in enumerate(waypoints):
     goto_waypoint(waypoint, i + 1)
-    
+
+def set_servo_pwm(channel, pwm_value):
+    """
+    Sends a MAV_CMD_DO_SET_SERVO command to set servo PWM.
+    :param channel: Servo channel (9-14 for AUX pins)
+    :param pwm_value: PWM value (1100-1900 µs)
+    """
+    msg = vehicle.message_factory.command_long_encode(
+        0, 0,  # target system, target component
+        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,  # Command
+        0,  # Confirmation
+        channel,  # Servo channel
+        pwm_value,  # PWM value
+        0, 0, 0, 0, 0  # Unused parameters
+    )
+    vehicle.send_mavlink(msg)
+    vehicle.flush()
+    print(f"Servo {channel} set to {pwm_value} µs")
+
+
+# Example: Move servo on Channel 4 to 1500µs
+set_servo_pwm(4, 1900)
+time.sleep(3)
+set_servo_pwm(4, 981)
+time.sleep(1)
+
 exit()
