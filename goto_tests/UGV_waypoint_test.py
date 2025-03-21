@@ -54,17 +54,23 @@ def distance_to(target_location, current_location):
     return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
 
 
+
 # Function to move to a waypoint and check when it is reached
 def goto_waypoint(waypoint, waypoint_number):
     print(f"Going towards waypoint {waypoint_number}...")
-    vehicle.simple_goto(waypoint, groundspeed=2.5)
+    vehicle.simple_goto(waypoint, groundspeed=2)
 
     while True:
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
-        time.sleep(45)
+
+        if distance < 0.5:  # Stop when within 1 meter of the target
+            print(f"Reached waypoint {waypoint_number}")
+            break
+
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(1)  # Check every second
+
 
 
 
