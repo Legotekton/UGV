@@ -99,19 +99,19 @@ def goto_waypoint(waypoint, waypoint_number):
 # Main execution
 print("MAIN:  Code Started")
 
-vehicle = connectRover()
+#vehicle = connectRover()
 print("Vehicle connected")
 
 # Establish connection to Pixhawk
-#master = mavutil.mavlink_connection("/dev/ttyAMA0", baud=57600)
-#master.wait_heartbeat()
+master = mavutil.mavlink_connection("/dev/ttyAMA0", baud=57600)
+master.wait_heartbeat()
 
 
 # Function to send servo command
 def set_servo_pwm(channel, pwm_value):
-    vehicle.mav.command_long_send(
-        vehicle.target_system, 
-        vehicle.target_component,
+    master.mav.command_long_send(
+        master.target_system, 
+        master.target_component,
         mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
         0,  # Confirmation
         channel,  # Channel number
@@ -122,6 +122,5 @@ def set_servo_pwm(channel, pwm_value):
 # Example: Move servo on AUX1 (Channel 9) to 1500µs
 set_servo_pwm(4, 1500)
 time.sleep(2)
-
 
 exit()
