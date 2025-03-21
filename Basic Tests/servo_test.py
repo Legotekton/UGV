@@ -124,7 +124,7 @@ def set_servo_pwm(channel, pwm_value):
 # Example: Move servo on Channel 4 to 1500µs
 set_servo_pwm(4, 1900)
 time.sleep(10)
-set_servo_pwm(4, 1500)
+set_servo_pwm(4, 981)
 time.sleep(1)
 
 exit()
