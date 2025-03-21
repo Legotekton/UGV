@@ -102,8 +102,10 @@ print("MAIN:  Code Started")
 vehicle = connectRover()
 print("Vehicle connected")
 
+manaul_arm()
+
 # Establish connection to Pixhawk
-master = mavutil.mavlink_connection("/dev/serial0", baud=57600)
+master = mavutil.mavlink_connection("/dev/ttyAMA0", baud=57600)
 master.wait_heartbeat()
 
 
