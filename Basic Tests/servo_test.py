@@ -99,7 +99,7 @@ def goto_waypoint(waypoint, waypoint_number):
 # Main execution
 print("MAIN:  Code Started")
 
-vehicle = connectRover()
+#vehicle = connectRover()
 print("Vehicle connected")
 
 # Establish connection to Pixhawk
