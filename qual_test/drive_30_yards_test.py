@@ -4,6 +4,9 @@ import argparse
 import os
 import socket
 import math
+from pymavlink import mavutil
+
+
 
 # Connect to the Vehicle function
 def connectRover():
@@ -24,6 +27,8 @@ def connectRover():
   #print("GPS Location: " % vehicle.location.global_frame)    
 
   return vehicle
+
+
 
 # Function to manually arm the vehicle
 def manaul_arm():
@@ -47,6 +52,8 @@ def manaul_arm():
   print("   Vehicle armed.")
   print("   Mode: %s" % vehicle.mode.name) 
 
+
+
 # Function to calculate distance between two GPS coordinates
 def distance_to(target_location, current_location):
     dlat = target_location.lat - current_location.lat
@@ -64,39 +71,26 @@ def goto_waypoint(waypoint, waypoint_number):
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
 
-        if distance < 0.5:  # Stop when within 1 meter of the target
+        if distance < 0.1:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(1)  # Check every second
 
-
-
-# Function to calculate new GPS coordinates based on distance and heading
-def get_target_location(original_location, distance_meters, heading_degrees):
-    """
-    Compute a new latitude/longitude given a starting point, distance, and heading.
-    """
-    earth_radius = 6378137.0  # Earth radius in meters
-
-    # Convert latitude/longitude from degrees to radians
-    lat1 = math.radians(original_location.lat)
-    lon1 = math.radians(original_location.lon)
-
-    # Convert heading to radians
-    heading = math.radians(heading_degrees)
-
-    # Calculate new latitude
-    lat2 = math.asin(math.sin(lat1) * math.cos(distance_meters / earth_radius) +
-                     math.cos(lat1) * math.sin(distance_meters / earth_radius) * math.cos(heading))
-
-    # Calculate new longitude
-    lon2 = lon1 + math.atan2(math.sin(heading) * math.sin(distance_meters / earth_radius) * math.cos(lat1),
-                             math.cos(distance_meters / earth_radius) - math.sin(lat1) * math.sin(lat2))
-
-    # Convert back to degrees
-    return LocationGlobalRelative(math.degrees(lat2), math.degrees(lon2), original_location.alt)
+def send_ned_position(x, y, z):
+    msg = vehicle.message_factory.set_position_target_local_ned_encode(
+        0,  # time_boot_ms (not used)
+        0, 0,  # target system, target component
+        mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,  # Relative to current position
+        0b0000111111111000,  # Bitmask: Only position control
+        x, y, z,  # Positions (X=Forward, Y=Right, Z=Down)
+        0, 0, 0,  # Velocity (not used)
+        0, 0, 0,  # Acceleration (not used)
+        0, 0  # Y
+    )
+    vehicle.send_mavlink(msg)
+    vehicle.flush()
 
 
 
@@ -108,10 +102,9 @@ print("Vehicle connected")
 
 manaul_arm()
 
-start_location = vehicle.location.global_relative_frame
 
-target_location = get_target_location(start_location, 27.4, vehicle.heading)  
-
-goto_waypoint(target_location, 1)
+# Example: Move servo on Channel 4 to 1500µs
+send_ned_position(30, 0, 0)
+time.sleep(8)
 
 exit()

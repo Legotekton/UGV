@@ -110,7 +110,7 @@ def set_servo_pwm(channel, pwm_value):
         channel,  # Servo channel
         pwm_value,  # PWM value
         0, 0, 0, 0, 0  # Unused parameters
-    )
+    )                                                                                                                                      
     vehicle.send_mavlink(msg)
     vehicle.flush()
     print(f"Servo {channel} set to {pwm_value} µs")
