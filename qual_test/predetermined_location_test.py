@@ -42,7 +42,7 @@ def manaul_arm():
     print("   Waiting for arming...")
     time.sleep(1)
 
-  vehicle.mode = VehicleMode("GUIDED")
+  vehicle.mode = VehicleMode("AUTO")
 
   print("   Vehicle armed.")
   print("   Mode: %s" % vehicle.mode.name) 
