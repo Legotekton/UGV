@@ -71,13 +71,26 @@ def goto_waypoint(waypoint, waypoint_number):
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
 
-        if distance < 0.3:  # Stop when within 1 meter of the target
+        if distance < 0.1:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(1)  # Check every second
 
+
+def send_ned_velocity(vx, vy, vz):
+    msg = vehicle.message_factory.set_position_target_local_ned_encode(
+        0, 0, 0,
+        mavutil.mavlink.MAV_FRAME_BODY_NED,
+        0b0000111111000111,  # velocity only
+        0, 0, 0,
+        vx, vy, vz,
+        0, 0, 0,
+        0, 0
+    )
+    vehicle.send_mavlink(msg)
+    vehicle.flush()
 
 
 
@@ -89,15 +102,9 @@ print("Vehicle connected")
 
 manaul_arm()
 
-waypoints = [
-  LocationGlobalRelative(27.9867246, -82.3018261, 0),
-  LocationGlobalRelative(27.9866412, -82.3018254, 0)
-  LocationGlobalRelative(27.9866370, -82.3016451, 0)
-  LocationGlobalRelative(27.9867282, -82.3016444, 0)
-]
-
-for i, waypoint in enumerate(waypoints):
-    goto_waypoint(waypoint, i + 1)
-
+start_time = time.time()
+while time.time() - start_time < 30:
+  send_ned_velocity(2, 0, 0)
+  time.sleep(1) 
 
 exit()
