@@ -71,7 +71,7 @@ def goto_waypoint(waypoint, waypoint_number):
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
 
-        if distance < 0.1:  # Stop when within 1 meter of the target
+        if distance < 0.3:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
@@ -79,24 +79,7 @@ def goto_waypoint(waypoint, waypoint_number):
         time.sleep(1)  # Check every second
 
 
-
-
-
-# Main execution
-print("MAIN:  Code Started")
-
-vehicle = connectRover()
-print("Vehicle connected")
-
-manaul_arm()
-
-waypoints = [
-  LocationGlobalRelative(27.9867406, -82.3015586, 0)
-]
-
-for i, waypoint in enumerate(waypoints):
-    goto_waypoint(waypoint, i + 1)
-
+# Function to set servo PWM
 def set_servo_pwm(channel, pwm_value):
     """
     Sends a MAV_CMD_DO_SET_SERVO command to set servo PWM.
@@ -115,6 +98,23 @@ def set_servo_pwm(channel, pwm_value):
     vehicle.flush()
     print(f"Servo {channel} set to {pwm_value} µs")
 
+
+
+
+# Main execution
+print("MAIN:  Code Started")
+
+vehicle = connectRover()
+print("Vehicle connected")
+
+manaul_arm()
+
+waypoints = [
+  LocationGlobalRelative(27.9867406, -82.3015586, 0)
+]
+
+for i, waypoint in enumerate(waypoints):
+    goto_waypoint(waypoint, i + 1)
 
 # Example: Move servo on Channel 4 to 1500µs
 set_servo_pwm(4, 1900)
