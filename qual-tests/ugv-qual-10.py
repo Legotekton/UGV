@@ -78,16 +78,16 @@ def goto_waypoint(waypoint, waypoint_number):
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(1)  # Check every second
 
-def send_ned_position(x, y, z):
+
+def send_ned_velocity(vx, vy, vz):
     msg = vehicle.message_factory.set_position_target_local_ned_encode(
-        0,  # time_boot_ms (not used)
-        0, 0,  # target system, target component
-        mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,  # Relative to current position
-        0b0000111111111000,  # Bitmask: Only position control
-        x, y, z,  # Positions (X=Forward, Y=Right, Z=Down)
-        0, 0, 0,  # Velocity (not used)
-        0, 0, 0,  # Acceleration (not used)
-        0, 0  # Y
+        0, 0, 0,
+        mavutil.mavlink.MAV_FRAME_BODY_NED,
+        0b0000111111000111,  # velocity only
+        0, 0, 0,
+        vx, vy, vz,
+        0, 0, 0,
+        0, 0
     )
     vehicle.send_mavlink(msg)
     vehicle.flush()
@@ -102,9 +102,9 @@ print("Vehicle connected")
 
 manaul_arm()
 
-
-# Example: Move servo on Channel 4 to 1500µs
-send_ned_position(30, 0, 0)
-time.sleep(8)
+start_time = time.time()
+while time.time() - start_time < 30:
+  send_ned_velocity(2, 0, 0)
+  time.sleep(1) 
 
 exit()
