@@ -91,9 +91,9 @@ manaul_arm()
 
 waypoints = [
   LocationGlobalRelative(27.9867246, -82.3018261, 0),
-  LocationGlobalRelative(27.9866412, -82.3018254, 0)
-  LocationGlobalRelative(27.9866370, -82.3016451, 0)
-  LocationGlobalRelative(27.9867282, -82.3016444, 0)
+  LocationGlobalRelative(27.9866412, -82.3018254, 0),
+  LocationGlobalRelative(27.9866370, -82.3016451, 0),
+  LocationGlobalRelative(27.9867282, -82.3016444, 0),
 ]
 
 for i, waypoint in enumerate(waypoints):
