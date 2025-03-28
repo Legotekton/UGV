@@ -81,11 +81,6 @@ def goto_waypoint(waypoint, waypoint_number):
 
 # Function to set servo PWM
 def set_servo_pwm(channel, pwm_value):
-    """
-    Sends a MAV_CMD_DO_SET_SERVO command to set servo PWM.
-    :param channel: Servo channel (9-14 for AUX pins)
-    :param pwm_value: PWM value (1100-1900 µs)
-    """
     msg = vehicle.message_factory.command_long_encode(
         0, 0,  # target system, target component
         mavutil.mavlink.MAV_CMD_DO_SET_SERVO,  # Command
@@ -110,7 +105,7 @@ print("Vehicle connected")
 manaul_arm()
 
 waypoints = [
-  LocationGlobalRelative(27.9867406, -82.3015586, 0)
+  LocationGlobalRelative(27.9866475, -82.3017249, 0)
 ]
 
 for i, waypoint in enumerate(waypoints):
@@ -118,7 +113,8 @@ for i, waypoint in enumerate(waypoints):
 
 # Example: Move servo on Channel 4 to 1500µs
 set_servo_pwm(4, 1900)
-time.sleep(6)
+time.sleep(6q)
+print("Finished moving servo")
 set_servo_pwm(4, 981)
 time.sleep(1)
 
