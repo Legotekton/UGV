@@ -91,7 +91,7 @@ print("Vehicle connected")
 manaul_arm()
 
 waypoints = [
-  LocationGlobalRelative(27.9866465, -82.3015285, 21.32)
+  LocationGlobalRelative(27.9867406, -82.3015586, 0)
 ]
 
 for i, waypoint in enumerate(waypoints):
