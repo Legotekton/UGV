@@ -113,7 +113,7 @@ for i, waypoint in enumerate(waypoints):
 
 # Example: Move servo on Channel 4 to 1500µs
 set_servo_pwm(4, 1900)
-time.sleep(6q)
+time.sleep(5)
 print("Finished moving servo")
 set_servo_pwm(4, 981)
 time.sleep(1)
