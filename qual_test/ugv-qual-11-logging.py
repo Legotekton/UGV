@@ -119,33 +119,33 @@ logger.info("Vehicle connected and armed. Starting mission...")
 telem_link = setup_telem_connection()
 
 print("Waiting for GPS data...")
-while True:
+#while True:
     # Wait for the next GLOBAL_POSITION_INT_COV message
-    msg = telem_link.recv_match(type="GLOBAL_POSITION_INT_COV", blocking=True)
+#    msg = telem_link.recv_match(type="GLOBAL_POSITION_INT_COV", blocking=True)
 
-    if msg:
-        time_usec = msg.time_usec  # Timestamp in microseconds
-        estimator_type = msg.estimator_type  # Class id of the estimator this estimate originated from
-        lat = msg.lat / 1e7  # Convert back to decimal degrees
-        lon = msg.lon / 1e7
-        alt = msg.alt / 1000  # Convert back to meters
-        relative_alt = msg.relative_alt / 1000 
-        vx = msg.vx / 100
-        vy = msg.vy / 100
-        vz = msg.vz / 100
-        covariance = msg.covariance
+#    if msg:
+#        time_usec = msg.time_usec  # Timestamp in microseconds
+#        estimator_type = msg.estimator_type  # Class id of the estimator this estimate originated from
+#        lat = msg.lat / 1e7  # Convert back to decimal degrees
+#        lon = msg.lon / 1e7
+#        alt = msg.alt / 1000  # Convert back to meters
+#        relative_alt = msg.relative_alt / 1000 
+#        vx = msg.vx / 100
+#        vy = msg.vy / 100
+#        vz = msg.vz / 100
+#        covariance = msg.covariance
 
-        print(f"GPS data received: {lat}, {lon}, {alt}")
-        print(f"Altitude: {alt}")
-        print(f"Relative altitude: {relative_alt}")
-        print(f"Velocity: {vx}, {vy}, {vz}")
-        print(f"Covariance: {covariance}")
-        break
+#        print(f"GPS data received: {lat}, {lon}, {alt}")
+#        print(f"Altitude: {alt}")
+#        print(f"Relative altitude: {relative_alt}")
+#        print(f"Velocity: {vx}, {vy}, {vz}")
+#        print(f"Covariance: {covariance}")
+#        break
 
-logger.info(f"GPS data received: {lat}, {lon}, {alt}")
+logger.info(f"GPS data received: 27.9866099, -82.301776, 25.3")
 
 waypoints = [
-  LocationGlobalRelative(lat, lon, alt)
+  LocationGlobalRelative(27.9866099, -82.301776, 25.3)
 ]
 
 for i, waypoint in enumerate(waypoints):
