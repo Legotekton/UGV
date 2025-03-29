@@ -8,6 +8,19 @@ from pymavlink import mavutil
 
 
 
+# Function to setup the telemetry connection
+def setup_telem_connection():
+    telem_port = "/dev/ttyUSB0"  # Same telemetry module
+    baud_rate = 57600  # Same baud rate
+
+    print("Connecting to telemetry module for Pi-to-Pi communication...")
+    telem_link = mavutil.mavlink_connection(telem_port, baud=baud_rate)
+    print("Telemetry link established, waiting for data...")
+
+    return telem_link
+
+
+
 # Connect to the Vehicle function
 def connectRover():
   print("Start Connection")
@@ -52,8 +65,6 @@ def manaul_arm():
   print("   Vehicle armed.")
   print("   Mode: %s" % vehicle.mode.name) 
 
-
-
 # Function to calculate distance between two GPS coordinates
 def distance_to(target_location, current_location):
     dlat = target_location.lat - current_location.lat
@@ -79,20 +90,6 @@ def goto_waypoint(waypoint, waypoint_number):
         time.sleep(2)  # Check every second
 
 
-# Function to set servo PWM
-def set_servo_pwm(channel, pwm_value):
-    msg = vehicle.message_factory.command_long_encode(
-        0, 0,  # target system, target component
-        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,  # Command
-        0,  # Confirmation
-        channel,  # Servo channel
-        pwm_value,  # PWM value
-        0, 0, 0, 0, 0  # Unused parameters
-    )                                                                                                                                      
-    vehicle.send_mavlink(msg)
-    vehicle.flush()
-    print(f"Servo {channel} set to {pwm_value} µs")
-
 
 
 
@@ -104,18 +101,48 @@ print("Vehicle connected")
 
 manaul_arm()
 
+start_time = time.time()  # Record start time for logging
+
+log_file = open("ugv-log.txt", "w")
+log_file.write("UGV Logging Started\n")
+log_file.write("Start Time: " + start_time + "\n")  # Log the start time
+
+telem_link = setup_telem_connection()
+
+print("Waiting for GPS data...")
+while True:
+    # Wait for the next GLOBAL_POSITION_INT_COV message
+    msg = telem_link.recv_match(type="GLOBAL_POSITION_INT_COV", blocking=True)
+
+    if msg:
+        time_usec = msg.time_usec  # Timestamp in microseconds
+        estimator_type = msg.estimator_type  # Class id of the estimator this estimate originated from
+        lat = msg.lat / 1e7  # Convert back to decimal degrees
+        lon = msg.lon / 1e7
+        alt = msg.alt / 1000  # Convert back to meters
+        relative_alt = msg.relative_alt / 1000 
+        vx = msg.vx / 100
+        vy = msg.vy / 100
+        vz = msg.vz / 100
+        covariance = msg.covariance
+
+        print(f"GPS data received: {lat}, {lon}, {alt}")
+        print(f"Altitude: {alt}")
+        print(f"Relative altitude: {relative_alt}")
+        print(f"Velocity: {vx}, {vy}, {vz}")
+        print(f"Covariance: {covariance}")
+        break
+
+log_file.write(f"GPS data received: {lat}, {lon}, {alt}\n")
+
 waypoints = [
-  LocationGlobalRelative(27.9866494, -82.3016410, 0)
+  LocationGlobalRelative(lat, lon, alt)
 ]
 
 for i, waypoint in enumerate(waypoints):
     goto_waypoint(waypoint, i + 1)
 
-# Example: Move servo on Channel 4 to 1500µs
-set_servo_pwm(4, 1900)
-time.sleep(5)
-print("Finished moving servo")
-set_servo_pwm(4, 981)
-time.sleep(1)
+log_file.write("Finish Time: " + (time.time() - start_time + "\n"))  # Log the finish time after all waypoints are processed
+log_file.close()  # Close the log file to ensure all data is written
 
 exit()

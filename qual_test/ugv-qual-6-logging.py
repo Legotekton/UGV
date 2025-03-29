@@ -104,8 +104,14 @@ print("Vehicle connected")
 
 manaul_arm()
 
+start_time = time.time()  # Record start time for logging
+
+log_file = open("ugv-log.txt", "w")
+log_file.write("UGV Logging Started\n")
+log_file.write("Start Time: " + start_time)
+
 waypoints = [
-  LocationGlobalRelative(27.9866494, -82.3016410, 0)
+  LocationGlobalRelative(27.9866475, -82.3017249, 0)
 ]
 
 for i, waypoint in enumerate(waypoints):
@@ -116,6 +122,8 @@ set_servo_pwm(4, 1900)
 time.sleep(5)
 print("Finished moving servo")
 set_servo_pwm(4, 981)
-time.sleep(1)
+
+log_file.write("Finish Time: " + (time.time() - start_time))
+log_file.close()  # Close the log file to ensure all data is written
 
 exit()
