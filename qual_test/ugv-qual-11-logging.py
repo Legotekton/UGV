@@ -5,7 +5,18 @@ import os
 import socket
 import math
 from pymavlink import mavutil
+import logging
 
+
+
+logging.basicConfig(
+    filename='ugv_log.txt',
+    filemode='w',
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s]: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger()
 
 
 # Function to setup the telemetry connection
@@ -103,9 +114,7 @@ manaul_arm()
 
 start_time = time.time()  # Record start time for logging
 
-log_file = open("ugv-log.txt", "w")
-log_file.write("UGV Logging Started\n")
-log_file.write("Start Time: " + start_time + "\n")  # Log the start time
+logger.info("Vehicle connected and armed. Starting mission...")
 
 telem_link = setup_telem_connection()
 
@@ -133,7 +142,7 @@ while True:
         print(f"Covariance: {covariance}")
         break
 
-log_file.write(f"GPS data received: {lat}, {lon}, {alt}\n")
+logger.info(f"GPS data received: {lat}, {lon}, {alt}")
 
 waypoints = [
   LocationGlobalRelative(lat, lon, alt)
@@ -142,7 +151,6 @@ waypoints = [
 for i, waypoint in enumerate(waypoints):
     goto_waypoint(waypoint, i + 1)
 
-log_file.write("Finish Time: " + (time.time() - start_time + "\n"))  # Log the finish time after all waypoints are processed
-log_file.close()  # Close the log file to ensure all data is written
+logger.info("Mission completed.")
 
 exit()
