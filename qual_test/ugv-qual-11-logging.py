@@ -93,7 +93,7 @@ def goto_waypoint(waypoint, waypoint_number):
         distance = distance_to(waypoint, current_location)
         vehicle.simple_goto(waypoint, groundspeed=2)
 
-        if distance < 0.3:  # Stop when within 1 meter of the target
+        if distance < 0.5:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
