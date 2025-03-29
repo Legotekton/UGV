@@ -98,7 +98,7 @@ def goto_waypoint(waypoint, waypoint_number):
             break
 
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
-        time.sleep(2)  # Check every second
+        time.sleep(1)  # Check every second
 
 
 
