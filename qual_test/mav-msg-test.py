@@ -63,37 +63,32 @@ def distance_to(target_location, current_location):
 
 
 # Function to move to a waypoint and check when it is reached
-def goto_waypoint(waypoint, waypoint_number):
-    print(f"Going towards waypoint {waypoint_number}...")
+def goto_waypoint(lat,lon, alt, waypoint_number):
+    msg = vehicle.message_factory.set_position_target_global_int_encode(
+        0,  # Time since system boot (not used)
+        0, 0,  # Target system, target component
+        mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,  # Use relative altitude
+        int(0b0000111111111000),  # Type mask (only positions enabled)
+        int(lat * 1e7),  # Latitude (scaled)
+        int(lon * 1e7),  # Longitude (scaled)
+        alt,  # Altitude (meters, relative)
+        0, 0, 0,  # Velocity (not set)
+        0, 0, 0,  # Acceleration (not set)
+        0, 0  # Yaw, Yaw rate (not set)
+    )
+    vehicle.send_mavlink(msg)
+    vehicle.flush()
 
     while True:
         current_location = vehicle.location.global_relative_frame
-        distance = distance_to(waypoint, current_location)
-        vehicle.simple_goto(waypoint, groundspeed=2)
+        distance = distance_to(LocationGlobalRelative(lat, lon, alt), current_location)
 
-        if distance < 0.3:  # Stop when within 1 meter of the target
+        if distance < 0.3:
             print(f"Reached waypoint {waypoint_number}")
             break
 
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
-        time.sleep(2)  # Check every second
-
-
-# Function to set servo PWM
-def set_servo_pwm(channel, pwm_value):
-    msg = vehicle.message_factory.command_long_encode(
-        0, 0,  # target system, target component
-        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,  # Command
-        0,  # Confirmation
-        channel,  # Servo channel
-        pwm_value,  # PWM value
-        0, 0, 0, 0, 0  # Unused parameters
-    )                                                                                                                                      
-    vehicle.send_mavlink(msg)
-    vehicle.flush()
-    print(f"Servo {channel} set to {pwm_value} µs")
-
-
+        time.sleep(0.5)  # Check every 1/2 second
 
 
 # Main execution
@@ -104,26 +99,7 @@ print("Vehicle connected")
 
 manaul_arm()
 
-start_time = time.time()  # Record start time for logging
+goto_waypoint(27.9866659,-82.3018193,17.09, 1)
 
-log_file = open("ugv-log.txt", "w")
-log_file.write("UGV Logging Started\n")
-log_file.write("Start Time: " + start_time)
-
-waypoints = [
-  LocationGlobalRelative(27.9866475, -82.3017249, 0)
-]
-
-for i, waypoint in enumerate(waypoints):
-    goto_waypoint(waypoint, i + 1)
-
-# Example: Move servo on Channel 4 to 1500µs
-set_servo_pwm(4, 1900)
-time.sleep(5)
-print("Finished moving servo")
-set_servo_pwm(4, 981)
-
-log_file.write("Finish Time: " + (time.time() - start_time))
-log_file.close()  # Close the log file to ensure all data is written
 
 exit()
