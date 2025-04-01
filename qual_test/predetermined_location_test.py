@@ -58,13 +58,13 @@ def distance_to(target_location, current_location):
 # Function to move to a waypoint and check when it is reached
 def goto_waypoint(waypoint, waypoint_number):
     print(f"Going towards waypoint {waypoint_number}...")
-    vehicle.simple_goto(waypoint, groundspeed=2)
-
+    
     while True:
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(waypoint, current_location)
+        vehicle.simple_goto(waypoint, groundspeed=2)
 
-        if distance < 0.1:  # Stop when within 1 meter of the target
+        if distance < 0.3:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
@@ -83,7 +83,7 @@ print("Vehicle connected")
 manaul_arm()
 
 waypoints = [
-  LocationGlobalRelative(27.9866854, -82.3015586, 27.79)
+  LocationGlobalRelative(27.9866659,-82.3018193,17.09)
 ]
 
 for i, waypoint in enumerate(waypoints):
