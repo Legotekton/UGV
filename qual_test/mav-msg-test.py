@@ -69,8 +69,8 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
         0, 0,  # Target system, target component
         mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,  # Use relative altitude
         int(0b0000111111111000),  # Type mask (only positions enabled)
-        lat,  # Latitude (scaled)
-        lon,  # Longitude (scaled)
+        int(lat * 1e7),  # Latitude (scaled)
+        int(lon * 1e7),  # Longitude (scaled)
         alt,  # Altitude (meters, relative)
         0, 0, 0,  # Velocity (not set)
         0, 0, 0,  # Acceleration (not set)
@@ -83,12 +83,12 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(LocationGlobalRelative(lat, lon, alt), current_location)
 
-        if distance < 0.3:
+        if distance < 0.3:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
-        time.sleep(0.5)  # Check every 1/2 second
+        time.sleep(0.5)  # Check every second
 
 
 # Main execution
