@@ -99,7 +99,7 @@ print("Vehicle connected")
 
 manaul_arm()
 
-goto_waypoint(27.9866659,-82.3018193,17.09, 1)
+goto_waypoint(27.9866689,-82.30177,18.44, 1)
 print("Finished")
 
 exit()
