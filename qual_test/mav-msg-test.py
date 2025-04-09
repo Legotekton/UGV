@@ -83,7 +83,7 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
         current_location = vehicle.location.global_relative_frame
         distance = distance_to(LocationGlobalRelative(lat, lon, alt), current_location)
 
-        if distance < 0.25:  # Stop when within 1 meter of the target
+        if distance < 1:  # Stop when within 1 meter of the target
             print(f"Reached waypoint {waypoint_number}")
             break
 
@@ -98,8 +98,25 @@ vehicle = connectRover()
 print("Vehicle connected")
 
 manaul_arm()
+lat = 27.9866552
+lon = -82.3017789
+alt = 9.21
 
-goto_waypoint(27.9866552,-82.3017789,9.21, 1)
+goto_waypoint(lat,lon,alt, 1)
 print("Finished")
+msg = vehicle.message_factory.set_position_target_global_int_encode(
+        0,  # Time since system boot (not used)
+        0, 0,  # Target system, target component
+        mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,  # Use relative altitude
+        int(0b0000111111111000),  # Type mask (only positions enabled)
+        int(lat * 1e7),  # Latitude (scaled)
+        int(lon * 1e7),  # Longitude (scaled)
+        alt,  # Altitude (meters, relative)
+        0, 0, 0,  # Velocity (not set)
+        0, 0, 0,  # Acceleration (not set)
+        0, 0  # Yaw, Yaw rate (not set)
+    )
+vehicle.send_mavlink(msg)
+vehicle.flush()
 
 exit()
