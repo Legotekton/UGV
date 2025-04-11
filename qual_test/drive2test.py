@@ -117,5 +117,5 @@ alt = 22.68
 goto_waypoint(lat,lon,alt, 1)
 time.sleep(3)
 send_ned_velocity(1, 0, 0)
-time.sleep(0.15) 
+time.sleep(0.10) 
 print("Finished")
