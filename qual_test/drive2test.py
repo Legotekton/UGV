@@ -90,6 +90,8 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
         print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
         time.sleep(0.5)  # Check every second
 
+
+
 def send_ned_velocity(vx, vy, vz):
     msg = vehicle.message_factory.set_position_target_local_ned_encode(
         0, 0, 0,
@@ -102,6 +104,22 @@ def send_ned_velocity(vx, vy, vz):
     )
     vehicle.send_mavlink(msg)
     vehicle.flush()
+
+
+
+# Function to set servo PWM
+def set_servo_pwm(channel, pwm_value):
+    msg = vehicle.message_factory.command_long_encode(
+        0, 0,  # target system, target component
+        mavutil.mavlink.MAV_CMD_DO_SET_SERVO,  # Command
+        0,  # Confirmation
+        channel,  # Servo channel
+        pwm_value,  # PWM value
+        0, 0, 0, 0, 0  # Unused parameters
+    )                                                                                                                                      
+    vehicle.send_mavlink(msg)
+    vehicle.flush()
+    print(f"Servo {channel} set to {pwm_value} µs")
 
 # Main execution
 print("MAIN:  Code Started")
@@ -119,3 +137,9 @@ time.sleep(3)
 send_ned_velocity(0.5, 0, 0)
 time.sleep(0.10) 
 print("Finished")
+
+set_servo_pwm(4, 1000)
+time.sleep(4)
+print("Finished moving servo")
+set_servo_pwm(4, 1500)
+time.sleep(1)
