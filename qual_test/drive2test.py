@@ -110,9 +110,9 @@ vehicle = connectRover()
 print("Vehicle connected")
 
 manaul_arm()
-lat = 27.9866552
-lon = -82.3017789
-alt = 9.21
+lat = 27.9866599
+lon = -82.3017326
+alt = 22.68
 
 goto_waypoint(lat,lon,alt, 1)
 time.sleep(3)
