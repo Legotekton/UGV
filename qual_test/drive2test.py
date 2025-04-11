@@ -133,13 +133,12 @@ lon = -82.3017326
 alt = 22.68
 
 goto_waypoint(lat,lon,alt, 1)
-time.sleep(3)
 send_ned_velocity(0.5, 0, 0)
 time.sleep(0.10) 
 print("Finished")
 
-set_servo_pwm(3, 1000)
+set_servo_pwm(4, 1000)
 time.sleep(4)
 print("Finished moving servo")
-set_servo_pwm(3, 1500)
+set_servo_pwm(4, 1500)
 time.sleep(1)
