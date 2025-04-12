@@ -135,7 +135,7 @@ alt = 18.92
 goto_waypoint(lat,lon,alt, 1)
 
 set_servo_pwm(4, 1000)
-time.sleep(4)
+time.sleep(10)
 print("Finished moving servo")
 set_servo_pwm(4, 1500)
 time.sleep(1)
