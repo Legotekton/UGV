@@ -128,14 +128,6 @@ vehicle = connectRover()
 print("Vehicle connected")
 
 manaul_arm()
-lat = 27.9866599
-lon = -82.3017326
-alt = 22.68
-
-goto_waypoint(lat,lon,alt, 1)
-send_ned_velocity(0.5, 0, 0)
-time.sleep(0.10) 
-print("Finished")
 
 set_servo_pwm(4, 1000)
 time.sleep(4)
