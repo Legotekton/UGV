@@ -107,6 +107,20 @@ def send_ned_velocity(vx, vy, vz):
 
 
 
+# Function to setup the telemetry connection
+def setup_telem_connection():
+    telem_port = "/dev/ttyUSB0"  # Same telemetry module
+    baud_rate = 57600  # Same baud rate
+
+    print("Connecting to telemetry module for Pi-to-Pi communication...")
+    telem_link = mavutil.mavlink_connection(telem_port, baud=baud_rate)
+    print("Telemetry link established, waiting for data...")
+
+    return telem_link
+
+
+
+
 # Function to set servo PWM
 def set_servo_pwm(channel, pwm_value):
     msg = vehicle.message_factory.command_long_encode(
@@ -129,12 +143,41 @@ print("Vehicle connected")
 
 manaul_arm()
 
+telem_link = setup_telem_connection()
 
-lat = 27.9866475
-lon = -82.3017989
-alt = 14.43
+print("Waiting for GPS data...")
+while True:
+    # Wait for the next GLOBAL_POSITION_INT_COV message
+    msg = telem_link.recv_match(type="GLOBAL_POSITION_INT_COV", blocking=True)
 
-goto_waypoint(lat,lon,alt, 1)
+    if msg:
+        time_usec = msg.time_usec  # Timestamp in microseconds
+        estimator_type = msg.estimator_type  # Class id of the estimator this estimate originated from
+        lat = msg.lat / 1e7  # Convert back to decimal degrees
+        lon = msg.lon / 1e7
+        alt = msg.alt / 1000  # Convert back to meters
+        relative_alt = msg.relative_alt / 1000 
+        vx = msg.vx / 100
+        vy = msg.vy / 100
+        vz = msg.vz / 100
+        covariance = msg.covariance
+
+        print(f"GPS data received: {lat}, {lon}, {alt}")
+        print(f"Altitude: {alt}")
+        print(f"Relative altitude: {relative_alt}")
+        print(f"Velocity: {vx}, {vy}, {vz}")
+        print(f"Covariance: {covariance}")
+        break
+
+while True:
+    if vehicle.gps_0.fix_type != 6:
+        print("\nError: GPS does not have RTK Fixed")
+        print("GPS STATUS: %s" % vehicle.gps_0.fix_type)
+    else:
+        goto_waypoint(lat,lon,alt, 1)
+        break
+
+exit()
 
 #set_servo_pwm(4, 1000)
 #time.sleep(5)
