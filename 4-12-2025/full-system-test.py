@@ -169,6 +169,7 @@ while True:
         print(f"Covariance: {covariance}")
         break
 
+time.sleep(5)
 start_time = time.time()
 while time.time() - start_time < 180:
     if vehicle.gps_0.fix_type != 6:
