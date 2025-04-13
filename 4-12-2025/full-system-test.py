@@ -169,7 +169,8 @@ while True:
         print(f"Covariance: {covariance}")
         break
 
-while True:
+start_time = time.time()
+while time.time() - start_time < 180:
     if vehicle.gps_0.fix_type != 6:
         print("\nError: GPS does not have RTK Fixed")
         print("GPS STATUS: %s" % vehicle.gps_0.fix_type)
