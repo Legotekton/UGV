@@ -175,9 +175,9 @@ while time.time() - start_time < 180:
         print("\nError: GPS does not have RTK Fixed")
         print("GPS STATUS: %s" % vehicle.gps_0.fix_type)
     else:
-        goto_waypoint(lat,lon,alt, 1)
         break
 
+goto_waypoint(lat,lon,alt, 1)
 exit()
 
 #set_servo_pwm(4, 1000)
