@@ -138,3 +138,6 @@ time.sleep(7)
 print("Finished moving servo")
 set_servo_pwm(4, 1500)
 time.sleep(1)
+start_time = time.time()
+while time.time() - start_time < 2:
+  send_ned_velocity(1,0,0)
