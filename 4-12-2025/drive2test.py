@@ -136,6 +136,8 @@ alt = 23.79
 
 
 goto_waypoint(lat,lon,alt, 1)
+current_loc = vehicle.location.global_relative_frame
+goto_waypoint(current_loc.lat,current_loc.lon,current_loc.alt, 2)
 set_servo_pwm(4, 1000)
 time.sleep(5)
 print("Finished moving servo")
