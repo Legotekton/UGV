@@ -130,7 +130,7 @@ print("Vehicle connected")
 manaul_arm()
 
 set_servo_pwm(4, 1000)
-time.sleep(10)
+time.sleep(7)
 print("Finished moving servo")
 set_servo_pwm(4, 1500)
 time.sleep(1)
