@@ -130,8 +130,8 @@ print("Vehicle connected")
 manaul_arm()
 
 
-lat = 27.9866969
-lon = -82.3017099
+lat = 27.9866971
+lon = -82.301098
 alt = 23.79
 
 
