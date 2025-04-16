@@ -132,10 +132,10 @@ manaul_arm()
 
 lat = 27.9866969
 lon = -82.3017099
-alt = 0
+alt = 23.79
+
 
 goto_waypoint(lat,lon,alt, 1)
-
 set_servo_pwm(4, 1000)
 time.sleep(5)
 print("Finished moving servo")
