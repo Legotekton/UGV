@@ -136,8 +136,8 @@ alt = 14.43
 
 goto_waypoint(lat,lon,alt, 1)
 
-#set_servo_pwm(4, 1000)
-#time.sleep(5)
-#print("Finished moving servo")
-#set_servo_pwm(4, 1500)
-#time.sleep(1)
+set_servo_pwm(4, 1000)
+time.sleep(5)
+print("Finished moving servo")
+set_servo_pwm(4, 1500)
+time.sleep(1)
