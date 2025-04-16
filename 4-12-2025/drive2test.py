@@ -130,9 +130,9 @@ print("Vehicle connected")
 manaul_arm()
 
 
-lat = 27.9866475
-lon = -82.3017989
-alt = 14.43
+lat = 27.9866969
+lon = -82.3017099
+alt = 0
 
 goto_waypoint(lat,lon,alt, 1)
 
