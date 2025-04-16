@@ -79,16 +79,8 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
     vehicle.send_mavlink(msg)
     vehicle.flush()
 
-    while True:
-        current_location = vehicle.location.global_relative_frame
-        distance = distance_to(LocationGlobalRelative(lat, lon, alt), current_location)
-
-        if distance < 0.25:  # Stop when within 1 meter of the target
-            print(f"Reached waypoint {waypoint_number}")
-            break
-
-        print(f"Distance to waypoint {waypoint_number}: {distance:.2f}m")
-        time.sleep(0.5)  # Check every second
+    while vehicle.velocity[0] == 0 and vehicle.velocity[1] == 0 and vehicle.velocity[2] == 0:
+        time.sleep(0.5)
 
 
 
@@ -136,8 +128,7 @@ alt = 23.79
 
 
 goto_waypoint(lat,lon,alt, 1)
-current_loc = vehicle.location.global_relative_frame
-goto_waypoint(current_loc.lat,current_loc.lon,current_loc.alt, 2)
+
 set_servo_pwm(4, 1000)
 time.sleep(7)
 print("Finished moving servo")
