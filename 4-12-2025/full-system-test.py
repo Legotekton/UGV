@@ -54,14 +54,6 @@ def manaul_arm():
 
 
 
-# Function to calculate distance between two GPS coordinates
-def distance_to(target_location, current_location):
-    dlat = target_location.lat - current_location.lat
-    dlong = target_location.lon - current_location.lon
-    return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
-
-
-
 # Function to move to a waypoint and check when it is reached
 def goto_waypoint(lat,lon, alt, waypoint_number):
     msg = vehicle.message_factory.set_position_target_global_int_encode(
