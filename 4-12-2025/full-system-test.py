@@ -74,6 +74,7 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
     while True:
         while vehicle.velocity[0] != 0 or vehicle.velocity[1] != 0 or vehicle.velocity[2] != 0:
           time.sleep(0.5)
+        time.sleep(2)
         if vehicle.velocity[0] == 0 and vehicle.velocity[1] == 0 and vehicle.velocity[2] == 0:
              break
 
