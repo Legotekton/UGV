@@ -74,10 +74,9 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
     while True:
         time.sleep(1)
         print("Driving...")
-        if vehicle.velocity[0] <= 0.05 and vehicle.velocity[1] <= 0.05 and vehicle.velocity[2] <= 0.05:
-          while time.time() - start_time < 2:
-            time.sleep(1)
-          if vehicle.velocity[0] <= 0.05 and vehicle.velocity[1] <= 0.05 and vehicle.velocity[2] <= 0.05:
+        if vehicle.velocity[0] <= 0.03 and vehicle.velocity[1] <= 0.03 and vehicle.velocity[2] <= 0.03:
+          time.sleep(5)
+          if vehicle.velocity[0] <= 0.03 and vehicle.velocity[1] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03:
             print("Reached Waypoint %d" % waypoint_number)
             break
           else:
