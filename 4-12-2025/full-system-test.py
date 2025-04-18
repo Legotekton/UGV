@@ -169,7 +169,7 @@ while time.time() - start_time < 180:
 goto_waypoint(lat,lon,alt, 1)
 
 set_servo_pwm(4, 1000)
-time.sleep(7)
+time.sleep(9)
 print("Finished moving servo")
 set_servo_pwm(4, 1500)
 time.sleep(1)

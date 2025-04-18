@@ -129,7 +129,7 @@ print("Vehicle connected")
 
 manaul_arm()
 
-home_point = 
+home_point = vehicle.location.global_relative_frame
 
 lat = 27.9866971
 lon = -82.3017098
@@ -139,10 +139,12 @@ alt = 23.79
 goto_waypoint(lat,lon,alt, 1)
 
 set_servo_pwm(4, 1000)
-time.sleep(7)
+time.sleep(9)
 print("Finished moving servo")
 set_servo_pwm(4, 1500)
 time.sleep(1)
 start_time = time.time()
 while time.time() - start_time < 1:
   send_ned_velocity(1,0,0)
+
+goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
