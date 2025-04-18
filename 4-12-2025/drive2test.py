@@ -136,7 +136,7 @@ lat = 27.9866142
 lon = -82.3017599
 alt = 15.11
 
-
+time.sleep(2)
 goto_waypoint(lat,lon,alt, 1)
 
 set_servo_pwm(4, 1000)
