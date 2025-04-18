@@ -139,7 +139,7 @@ telem_link = setup_telem_connection()
 print("Telemetry link on pi established")
 
 while True:
-    msg = mav.recv_match(type='STATUSTEXT', blocking=True)
+    msg = telem_link.recv_match(type="STATUSTEXT", blocking=True)
     if msg:
         print(f"[{msg.severity}] {msg.text}")
         break
