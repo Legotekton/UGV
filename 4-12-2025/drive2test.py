@@ -131,9 +131,9 @@ manaul_arm()
 
 home_point = vehicle.location.global_relative_frame
 
-lat = 27.9866971
-lon = -82.3017098
-alt = 23.79
+lat = 27.9866142
+lon = -82.3017599
+alt = 15.11
 
 
 goto_waypoint(lat,lon,alt, 1)
