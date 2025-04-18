@@ -74,9 +74,9 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
     while True:
         time.sleep(1)
         print("Driving...")
-        if -0.03 <= vehicle.velocity[2] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.033 and -0.03 <= vehicle.velocity[2] <= 0.03:
-          time.sleep(5)
-          if -0.03 <= vehicle.velocity[2] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.033 and -0.03 <= vehicle.velocity[2] <= 0.03:
+        if -0.03 <= vehicle.velocity[2] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03:
+          time.sleep(8)
+          if -0.03 <= vehicle.velocity[2] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03:
             print("Reached Waypoint %d" % waypoint_number)
             break
           else:
@@ -183,6 +183,7 @@ while time.time() - start_time < 120:
 
 time.sleep(2)
 goto_waypoint(lat,lon,alt, 1)
+
 set_servo_pwm(4, 1000)
 time.sleep(9)
 print("Finished moving servo")
