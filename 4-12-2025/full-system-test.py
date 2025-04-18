@@ -72,11 +72,16 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
     vehicle.flush()
     time.sleep(3)
     while True:
-        while vehicle.velocity[0] != 0 or vehicle.velocity[1] != 0 or vehicle.velocity[2] != 0:
-          time.sleep(0.5)
-        time.sleep(2)
+        time.sleep(0.5)
         if vehicle.velocity[0] <= 0.05 and vehicle.velocity[1] <= 0.05 and vehicle.velocity[2] <= 0.05:
-             break
+          time.sleep(2)
+          if vehicle.velocity[0] <= 0.05 and vehicle.velocity[1] <= 0.05 and vehicle.velocity[2] <= 0.05:
+            print("Reached Waypoint %d" % waypoint_number)
+            break
+          else:
+            continue
+        else:
+          continue
 
 
 
@@ -133,6 +138,8 @@ telem_link = setup_telem_connection()
 
 manaul_arm()
 
+home_point = vehicle.location.global_relative_frame
+
 print("Waiting for GPS data...")
 while True:
     # Wait for the next GLOBAL_POSITION_INT_COV message
@@ -166,6 +173,7 @@ while time.time() - start_time < 180:
     else:
         break
 
+time.sleep(2)
 goto_waypoint(lat,lon,alt, 1)
 
 set_servo_pwm(4, 1000)
@@ -173,6 +181,9 @@ time.sleep(9)
 print("Finished moving servo")
 set_servo_pwm(4, 1500)
 time.sleep(1)
+print("Moving Forward") 
 start_time = time.time()
 while time.time() - start_time < 1:
   send_ned_velocity(1,0,0)
+print("Returning Home")
+goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
