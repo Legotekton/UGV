@@ -129,6 +129,7 @@ print("Vehicle connected")
 
 manaul_arm()
 
+home_point = 
 
 lat = 27.9866971
 lon = -82.3017098
