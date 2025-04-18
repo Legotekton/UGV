@@ -166,7 +166,7 @@ while True:
 
 time.sleep(10)
 start_time = time.time()
-while time.time() - start_time < 180:
+while time.time() - start_time < 120:
     if vehicle.gps_0.fix_type != 6:
         print("\nError: GPS does not have RTK Fixed")
         print("GPS STATUS: %s" % vehicle.gps_0.fix_type)
