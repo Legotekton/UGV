@@ -5,7 +5,7 @@ import os
 import socket
 import math
 from pymavlink import mavutil
-
+import logging
 
 
 # Connect to the Vehicle function
@@ -132,6 +132,16 @@ def set_servo_pwm(channel, pwm_value):
 # Main execution
 print("MAIN:  Code Started")
 
+logging.basicConfig(
+    filename='ugv_log.txt',
+    filemode='w',
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s]: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger()
+
+
 vehicle = connectRover()
 print("Vehicle connected")
 
@@ -145,6 +155,8 @@ while True:
         break
 
 manaul_arm()
+
+logger.info("Vehicle connected and armed. Starting mission...")
 
 home_point = vehicle.location.global_relative_frame
 
@@ -172,20 +184,23 @@ while True:
         print(f"Covariance: {covariance}")
         break
 
-time.sleep(10)
+logger.info(f"GPS data recieved {lat},{lon},{alt}!")
 
-
-time.sleep(2)
+time.sleep(7)
 goto_waypoint(lat,lon,alt, 1)
 
 set_servo_pwm(4, 1000)
 time.sleep(9)
-print("Finished moving servo")
+print("Finished moving servo.")
 set_servo_pwm(4, 1500)
 time.sleep(1)
 print("Moving Forward") 
 start_time = time.time()
 while time.time() - start_time < 1:
   send_ned_velocity(1,0,0)
+
+logger.info("Delivered Payload.")
 print("Returning Home")
+
 goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
+logger.info("Mission completed.")
