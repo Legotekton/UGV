@@ -190,7 +190,7 @@ time.sleep(8)
 goto_waypoint(lat,lon,alt, 1)
 
 start_time = time.time()
-while time.time() - start_time < 0.1:
+while time.time() - start_time < 0.2:
   send_ned_velocity(0.5,0,0)
 
 set_servo_pwm(4, 1000)
