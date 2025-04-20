@@ -186,11 +186,11 @@ while True:
 
 logger.info(f"GPS data recieved {lat},{lon},{alt}!")
 
-time.sleep(7)
+time.sleep(8)
 goto_waypoint(lat,lon,alt, 1)
 
 set_servo_pwm(4, 1000)
-time.sleep(9)
+time.sleep(5)
 print("Finished moving servo.")
 set_servo_pwm(4, 1500)
 time.sleep(1)
