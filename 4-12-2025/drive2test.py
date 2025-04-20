@@ -5,6 +5,7 @@ import os
 import socket
 import math
 from pymavlink import mavutil
+import logging
 
 
 
@@ -54,14 +55,6 @@ def manaul_arm():
 
 
 
-# Function to calculate distance between two GPS coordinates
-def distance_to(target_location, current_location):
-    dlat = target_location.lat - current_location.lat
-    dlong = target_location.lon - current_location.lon
-    return math.sqrt((dlat ** 2) + (dlong ** 2)) * 1.113195e5  # Convert lat/lon degrees to meters
-
-
-
 # Function to move to a waypoint and check when it is reached
 def goto_waypoint(lat,lon, alt, waypoint_number):
     msg = vehicle.message_factory.set_position_target_global_int_encode(
@@ -80,16 +73,18 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
     vehicle.flush()
     time.sleep(3)
     while True:
-        time.sleep(0.5)
-        if vehicle.velocity[0] <= 0.05 and vehicle.velocity[1] <= 0.05 and vehicle.velocity[2] <= 0.05:
-          time.sleep(2)
-          if vehicle.velocity[0] <= 0.05 and vehicle.velocity[1] <= 0.05 and vehicle.velocity[2] <= 0.05:
+        time.sleep(1)
+        print("Driving...")
+        if -0.03 <= vehicle.velocity[0] <= 0.03 and -0.03 <= vehicle.velocity[1] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03:
+          time.sleep(3)
+          if -0.03 <= vehicle.velocity[0] <= 0.03 and -0.03 <= vehicle.velocity[1] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03:
             print("Reached Waypoint %d" % waypoint_number)
             break
           else:
             continue
         else:
           continue
+
 
 
 
@@ -125,6 +120,16 @@ def set_servo_pwm(channel, pwm_value):
 # Main execution
 print("MAIN:  Code Started")
 
+logging.basicConfig(
+    filename='ugv_log.txt',
+    filemode='w',
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s]: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger()
+
+
 vehicle = connectRover()
 print("Vehicle connected")
 
@@ -139,14 +144,23 @@ alt = 15.11
 time.sleep(2)
 goto_waypoint(lat,lon,alt, 1)
 
+logger.info(f"GPS data recieved {lat},{lon},{alt}!")
+
+time.sleep(7)
+goto_waypoint(lat,lon,alt, 1)
+
 set_servo_pwm(4, 1000)
 time.sleep(9)
-print("Finished moving servo")
+print("Finished moving servo.")
 set_servo_pwm(4, 1500)
 time.sleep(1)
 print("Moving Forward") 
 start_time = time.time()
 while time.time() - start_time < 1:
   send_ned_velocity(1,0,0)
+
+logger.info("Delivered Payload.")
 print("Returning Home")
+
 goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
+logger.info("Mission completed.")
