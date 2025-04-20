@@ -193,7 +193,7 @@ set_servo_pwm(4, 1000)
 time.sleep(7)
 print("Finished moving servo.")
 set_servo_pwm(4, 1500)
-time.sleep(1)
+time.sleep(0.25)
 print("Moving Forward") 
 start_time = time.time()
 while time.time() - start_time < 1:
