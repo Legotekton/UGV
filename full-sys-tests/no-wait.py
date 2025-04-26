@@ -129,9 +129,14 @@ def set_servo_pwm(channel, pwm_value):
     vehicle.flush()
     print(f"Servo {channel} set to {pwm_value} µs")
 
+
+
+
+
 # Main execution
 print("MAIN:  Code Started")
 
+# Basic logging setup
 logging.basicConfig(
     filename='ugv_log.txt',
     filemode='w',
@@ -142,24 +147,34 @@ logging.basicConfig(
 logger = logging.getLogger()
 
 
+# Connect raspberry pi to flight controller
 vehicle = connectRover()
 print("Vehicle connected")
 
+
+# Setup telemetry connection for Pi-to-Pi communication
 telem_link = setup_telem_connection()
 print("Telemetry link on pi established")
 
+
+# Wait for STATUSTEXT message to confirm connection from UAV
 while True:
     msg = telem_link.recv_match(type="STATUSTEXT", blocking=True)
     if msg:
         print(f"[{msg.severity}] {msg.text}")
         break
 
-manaul_arm()
 
+# Wait for manual arming before running mission
+manaul_arm()
 logger.info("Vehicle connected and armed. Starting mission...")
 
+
+# Set the inital home point location
 home_point = vehicle.location.global_relative_frame
 
+
+# Wait for GPS data from UAV
 print("Waiting for GPS data...")
 while True:
     # Wait for the next GLOBAL_POSITION_INT_COV message
@@ -183,29 +198,42 @@ while True:
         print(f"Velocity: {vx}, {vy}, {vz}")
         print(f"Covariance: {covariance}")
         break
-
 logger.info(f"GPS data recieved {lat},{lon},{alt}!")
 
+
+# Wait for UAV to lift off before moving to avoid crashes
 time.sleep(8)
 goto_waypoint(lat,lon,alt, 1)
+
 
 # Commented out the time-based loop to send velocity command before package dropoff
 #start_time = time.time()
 #while time.time() - start_time < 0.15:
 #  send_ned_velocity(0.5,0,0)
 
+
+# Move package servo
 set_servo_pwm(4, 1000)
 time.sleep(7)
 print("Finished moving servo.")
+
+
+# Stop package servo
 set_servo_pwm(4, 1500)
 time.sleep(0.25)
 print("Moving Forward") 
+
+
+# Move forward to verify package dropoff 
 start_time = time.time()
 while time.time() - start_time < 1:
   send_ned_velocity(1,0,0)
-
 logger.info("Delivered Payload.")
-print("Returning Home")
 
+
+# Return to home point command
+print("Returning Home")
 goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
+
+
 logger.info("Mission completed.")
