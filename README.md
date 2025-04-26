@@ -1,14 +1,20 @@
 # Code For UGV
 
-Code for the unmanned ground vehicle for USF
+This github contains the code we used for the Unmanned Ground Vehicle for the Rayheon Drone Competition on 4/26/2025
 
-> Testing The Different **Format** *Types*
->> This seems to make sense as a format
-> Cool
+## Explation of different files:
 
-1. One
-2. Two
-3. Three
-4. Four
+### 4-12-2025
 
-## Heading Two
+> Code from our latest round of testing before competition
+
+### basic-tests
+
+> Holds some code that we used to test simple features before implementing them in the greater whole
+### full-sys-test
+
+> holds copied code from our latest round of testing with some better explation for what the code does
+
+### testing
+
+> contains multiple different folders with our qual tests and others that we did wile testing
