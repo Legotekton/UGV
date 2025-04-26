@@ -158,7 +158,7 @@ manaul_arm()
 
 logger.info("Vehicle connected and armed. Starting mission...")
 
-#home_point = vehicle.location.global_relative_frame
+home_point = vehicle.location.global_relative_frame
 
 print("Waiting for GPS data...")
 while True:
@@ -206,5 +206,5 @@ while time.time() - start_time < 1:
 logger.info("Delivered Payload.")
 print("Returning Home")
 
-#goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
+goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
 logger.info("Mission completed.")
