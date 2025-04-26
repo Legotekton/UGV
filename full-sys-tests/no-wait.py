@@ -8,6 +8,7 @@ from pymavlink import mavutil
 import logging
 
 
+
 # Connect to the Vehicle function
 def connectRover():
   print("Start Connection")
@@ -86,6 +87,7 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
 
 
 
+# Function to send NED velocity command
 def send_ned_velocity(vx, vy, vz):
     msg = vehicle.message_factory.set_position_target_local_ned_encode(
         0, 0, 0,
@@ -111,7 +113,6 @@ def setup_telem_connection():
     print("Telemetry link established, waiting for data...")
 
     return telem_link
-
 
 
 
