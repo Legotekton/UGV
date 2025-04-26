@@ -189,6 +189,7 @@ logger.info(f"GPS data recieved {lat},{lon},{alt}!")
 time.sleep(8)
 goto_waypoint(lat,lon,alt, 1)
 
+# Commented out the time-based loop to send velocity command before package dropoff
 #start_time = time.time()
 #while time.time() - start_time < 0.15:
 #  send_ned_velocity(0.5,0,0)

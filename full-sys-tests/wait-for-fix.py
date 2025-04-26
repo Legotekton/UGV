@@ -75,7 +75,7 @@ def goto_waypoint(lat,lon, alt, waypoint_number):
         time.sleep(1)
         print("Driving...")
         if -0.03 <= vehicle.velocity[0] <= 0.03 and -0.03 <= vehicle.velocity[1] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03:
-          time.sleep(1.5)
+          time.sleep(3)
           if -0.03 <= vehicle.velocity[0] <= 0.03 and -0.03 <= vehicle.velocity[1] <= 0.03 and -0.03 <= vehicle.velocity[2] <= 0.03:
             print("Reached Waypoint %d" % waypoint_number)
             break
@@ -158,7 +158,7 @@ manaul_arm()
 
 logger.info("Vehicle connected and armed. Starting mission...")
 
-#home_point = vehicle.location.global_relative_frame
+home_point = vehicle.location.global_relative_frame
 
 print("Waiting for GPS data...")
 while True:
@@ -166,7 +166,7 @@ while True:
     msg = telem_link.recv_match(type="GLOBAL_POSITION_INT_COV", blocking=True)
 
     if msg:
-        time_usec = msg.time_usec  # Timestamp in microbseconds
+        time_usec = msg.time_usec  # Timestamp in microseconds
         estimator_type = msg.estimator_type  # Class id of the estimator this estimate originated from
         lat = msg.lat / 1e7  # Convert back to decimal degrees
         lon = msg.lon / 1e7
@@ -186,18 +186,23 @@ while True:
 
 logger.info(f"GPS data recieved {lat},{lon},{alt}!")
 
-time.sleep(8)
+time.sleep(10)
+start_time = time.time()
+while time.time() - start_time < 120:
+    if vehicle.gps_0.fix_type != 6:
+        print("\nError: GPS does not have RTK Fixed")
+        print("GPS STATUS: %s" % vehicle.gps_0.fix_type)
+    else:
+        break
+
+time.sleep(2)
 goto_waypoint(lat,lon,alt, 1)
 
-#start_time = time.time()
-#while time.time() - start_time < 0.15:
-#  send_ned_velocity(0.5,0,0)
-
 set_servo_pwm(4, 1000)
-time.sleep(7)
+time.sleep(9)
 print("Finished moving servo.")
 set_servo_pwm(4, 1500)
-time.sleep(0.25)
+time.sleep(1)
 print("Moving Forward") 
 start_time = time.time()
 while time.time() - start_time < 1:
@@ -206,5 +211,5 @@ while time.time() - start_time < 1:
 logger.info("Delivered Payload.")
 print("Returning Home")
 
-#goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
+goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
 logger.info("Mission completed.")

@@ -158,7 +158,7 @@ manaul_arm()
 
 logger.info("Vehicle connected and armed. Starting mission...")
 
-#home_point = vehicle.location.global_relative_frame
+home_point = vehicle.location.global_relative_frame
 
 print("Waiting for GPS data...")
 while True:
@@ -189,6 +189,7 @@ logger.info(f"GPS data recieved {lat},{lon},{alt}!")
 time.sleep(8)
 goto_waypoint(lat,lon,alt, 1)
 
+# Commented out the time-based loop to send velocity command before package dropoff
 #start_time = time.time()
 #while time.time() - start_time < 0.15:
 #  send_ned_velocity(0.5,0,0)
@@ -206,5 +207,5 @@ while time.time() - start_time < 1:
 logger.info("Delivered Payload.")
 print("Returning Home")
 
-#goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
+goto_waypoint(home_point.lat,home_point.lon,home_point.alt, 2)
 logger.info("Mission completed.")
